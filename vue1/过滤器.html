@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title></title>
+  <link rel="stylesheet" href="css/reset.css">
+  <script src="1.0.25/vue.js"></script>
+</head>
+<body>
+<style>
+  input{ border: 1px solid #ddd;}
+  .vueList{
+    width: 400px;
+    margin: 20px 0;
+  }
+  .vueList li{
+    display: flex;
+  }
+  .vueList li span{
+    flex: 1;
+    display: block;
+  }
+</style>
+<div id="vueInstance">
+  <section v-if="loginStatus">
+    输入您的姓名：<input type="text" v-model="name"/>
+    <button v-on:click="say">欢迎点击</button>
+    <button @click="switchLoginStatus">退出登录</button>
+  </section>
+
+  <section v-if="!loginStatus">
+    您的姓名：<input type="text" v-model="name"/>
+    您的密码：<input type="password" v-model="pwd"/>
+    <button @click="switchLoginStatus">登录</button>
+  </section>
+</div>
+
+<script>
+var v = new Vue({
+  el : '#vueInstance',
+  data : {
+    name : 'bobobo',
+    loginStatus : false
+  },
+  methods : {
+    say : function(){
+      console.log("欢迎" + this.name)
+    },
+    switchLoginStatus : function(){
+      this.loginStatus = !this.loginStatus;
+    }
+  }
+});
+console.log(v.name)
+</script>
+<ul id="ssd">
+      <li v-for="product in products">
+           {{ product.name | capitalize }} - {{ product.price | discount 25 | currency }}
+      </li>
+</ul>
+<script>
+ Vue.filter( 'discount' , function(value,discount) {
+        return value  * ( discount / 100 ) ;
+  });
+
+  new Vue({
+        el : '#ssd',
+        data : {
+              products : [
+                    {name: 'microphone', price: 25, category: 'electronics'},
+                    {name: 'laptop case', price: 15, category: 'accessories'},
+                    {name: 'screen cleaner', price: 17, category: 'accessories'},
+                    {name: 'laptop charger', price: 70, category: 'electronics'},
+                    {name: 'mouse', price: 40, category: 'electronics'},
+                    {name: 'earphones', price: 20, category: 'electronics'},
+                    {name: 'monitor', price: 120, category: 'electronics'}
+              ]
+        }
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title></title>
+  <link rel="stylesheet" href="css/reset.css">
+  <script src="1.0.25/vue.js"></script>
+</head>
+<body>
+<style>
+  input{ border: 1px solid #ddd;}
+  .vueList{
+    width: 400px;
+    margin: 20px 0;
+  }
+  .vueList li{
+    display: flex;
+  }
+  .vueList li span{
+    flex: 1;
+    display: block;
+  }
+</style>
+
+<div id="ca"><mine city="hubei"></mine></div>
+
+
+
+<div id="vueInstance">
+    <mines :namek='name'
+      :titlek='title'
+      :cityk='city'
+      :contentk='content'
+  ></mines>
+</div>
+<!--
+等号左右两边的字段名称可以不一样。
+等号左边的字段名，是指在子组件的props中声明的名字。在html写成肉串式，但是在props中写成驼峰式。
+等号右边的字段名，是指在父级里定义的字段的名字。是直接定义的数据或者循环的单条数据
+
+‘:’是‘v-bind’的缩写
+-->
+<template id="mineTpl">
+     <h1>{{ namek }}</h1>
+     <h2>{{ titlek }}</h2>
+     <h3>{{ cityk }}</h3>
+     <p>{{ contentk }}</p>
+</template>
+<script>
+//通过props向组件中传递数据
+/*
+每次创建组件实例的时候，这个实例都划分了自己的组件范围，这个范围导致了在这个组件区域内无法获得其父组件的数据。
+所以，Vue是如何处理父组件向子组件中传递数据的呢？答案是，通过props。
+*/
+/*
+先看一个最简单，从父组件向子组件中传递data的例子。注册的mine组件是子组件，
+他希望从父组件那里得到‘city’这个数据的信息，所以在mine的构造器里增加了一个参数props，
+用来接收父组件传递过来的city的值。
+*/
+/*
+props不一定要是数组，也可以是对象。可以在对象中详细的定义很多props的限制条件。。
+*/
+/*
+我们不需要每次都将props的限制条件都写出来，因为在这个例子中的数据是一个很简单的字段
+，上例中只是为了完整展示props的对象表示方法，所以才展开来写的。
+*/
+/*
+这样直接在mine标签里面定义‘city’字段，就是父组件指派字段的方式之一。
+但是这样直接指派是很瞎的，我们需要的是动态变化的city，这个一会我们会说到的。
+*/
+
+Vue.component('mine',{
+    template : '<p>Appian is from {{ city }}.</p>',
+    props : {
+        city : {
+            type : String,//定义字符串类型
+            required : true,//该字段是必须的
+            default : 'China'//设置默认值
+        }
+    }
+});
+var V = new Vue({
+	 el : '#ca'
+});
+</script>
+
+<script>
+//通过props向组件中传递数据
+/*
+每次创建组件实例的时候，这个实例都划分了自己的组件范围，这个范围导致了在这个组件区域内无法获得其父组件的数据。
+所以，Vue是如何处理父组件向子组件中传递数据的呢？答案是，通过props。
+*/
+/*
+先简单介绍一下我们接下来要做的事。我们要假装我们正在搭一个博客，博客需要展示作者的基本信息，
+此时，我们可能会需要一些数据对象，可能是从数据库获得的，或者ajax请求到的，
+总之就是请求到了之后，将这个数据对象定义在父级的data中。并在html的template标签中准备渲染。
+*/
+Vue.component('mines',{
+   template : '#mineTpl',
+   props : ['namek','titlek','cityk','contentk']
+});
+
+var V = new Vue({
+	 el : '#vueInstance',
+	 data : {//这样就能把父组件的4个字段绑定到子组件上。现在，只要父组件指派的字段的值一发生改变，子组件的值也会发生相应的改变。
+		name : 'Appian',
+		title : 'This is a title',
+		city : 'FuJian-XiaMen',
+		content : 'There are some desc about Appians Blog'
+	 }
+});
+</script>
+</body>
+</html>

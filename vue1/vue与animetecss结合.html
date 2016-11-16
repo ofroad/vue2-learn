@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title></title>
+<link rel="stylesheet" href="css/reset.css">
+<link rel='stylesheet prefetch' href='bootstrap.min.css'>
+<link rel='stylesheet prefetch' href='animate.min.css'>
+<style>
+
+</style>
+<script src="1.0.25/vue.js"></script>
+</head>
+<body>
+<h3>vue与animate.css结合</h3>
+
+<div id="app">
+  <div class="container">
+    <div class="form-group">
+      <label for="btn-demo">鼠标移入移出效果：</label>
+      <button class="btn"
+              :class="{'btn-primary': isShow}"
+              @mouseover="toggleShow()"
+              @mouseout="toggleShow()"
+              v-text="btnStyle"></button>
+      <span v-show="isShow"
+            class="label label-success animated"
+            :class="{'fadeIn': isShow}">Do you wannta see me?</span>
+    </div>
+  </div>
+</div>
+
+
+
+
+<script>
+new Vue({
+  el: "#app",
+  data: {
+    isShow: false,
+    btnStyle: 'Default'
+  },
+  methods: {
+    toggleShow: function() {
+      this.isShow = !this.isShow
+    }
+  },
+  watch: {//监视isShow的变化来切换文本
+    isShow: function(newVal) {
+      newVal ? this.btnStyle = 'Primary' : this.btnStyle = 'Default'
+    }
+  }
+})
+
+</script>
+
+</body>
+</html>

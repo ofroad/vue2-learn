@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+    <div id="demo">
+        <select v-model="value1" @change="change">
+            <option v-for="item in list1" :value="item">{{item.name}}</option>
+        </select>
+        <select v-model="value2">
+            <option v-for="item in list2 | parent value1" :value="item">{{item.name}}</option>
+        </select>
+
+        <p>{{value1|json}}</p>
+        <p>{{value2|json}}</p>
+    </div>
+
+    <!--<script src="http://cdn.bootcss.com/jquery/3.0.0/jquery.js"></script>-->
+    <script src="http://cdn.bootcss.com/vue/1.0.17/vue.min.js"></script>
+
+    <script>
+        'use strict';
+
+        new Vue({
+            el: '#demo',
+            data: {
+                value1: null,
+                value2: null,
+                list1: [],
+                list2: [],
+            },
+            ready() {
+                for (var i = 0; i < 10; i++) {
+                    this.list1.push({ id: i, name: 'p' + i })
+                    for (let j = 0; j < 10; j++) {
+                        this.list2.push({ pid: i, name: 'name' + i + '_' + j })
+                    }
+                }
+            },
+            methods: {
+                change() {
+                    console.log(this.value1)
+                    this.value2 = null
+                }
+            },
+            filters: {//v-for循环中过滤
+                parent(list2, value1) {
+                    if (!value1) return []
+                    //return list2.filter(t => t.pid === value1.id)
+					return list2.filter(function(t){
+						return t.pid === value1.id;
+					});
+                }
+            }
+        })
+    </script>
+</body>
+</html>

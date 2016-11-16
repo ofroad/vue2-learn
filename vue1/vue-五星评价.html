@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title></title>
+<link rel="stylesheet" href="css/reset.css">
+<link href="http://cdn.bootcss.com/font-awesome/3.2.0/css/font-awesome.min.css" rel="stylesheet">
+<style>
+.star {
+  text-align:left;
+  direction: rtl;
+}
+.star span:hover,
+.star span.active {
+  color:red;
+}
+.star span.active ~ span,
+.star span:hover ~ span {
+  color:red;
+}
+
+button {
+  margin-top: 10px;
+}
+</style>
+<script src="1.0.25/vue.js"></script>
+</head>
+<body>
+<h2>星星评分</h2>
+<div class="star">
+  <span v-for="i in num"
+        @click="selectStar(i)"
+        :class="{'active': currentIndex == i}"
+        class="icon-star">
+  </span>
+</div>
+ <button @click="getNum">获取值</button>
+
+
+
+<script>
+new Vue({
+  el: 'body',
+  data: {
+    num: 5,
+    currentIndex: -1
+  },
+  methods: {
+    selectStar: function(index){
+      this.currentIndex = index;
+    },
+    getNum: function(){
+      var value = -1;
+      if(this.currentIndex >= 0) {
+        value = this.num - this.currentIndex;
+      }
+      alert(value);
+    }
+  }
+})
+</script>
+
+</body>
+</html>

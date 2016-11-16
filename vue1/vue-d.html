@@ -1,0 +1,17 @@
+//http://stackoverflow.com/questions/9841363/how-to-restrict-number-of-characters-that-can-be-entered-in-html5-number-input-f
+//<textarea v-model="content" v-maxchars="140"></textarea><p>{{content.length}}/140</p>
+Vue.directive('maxchars', {
+    bind: function () {
+        var self = this;
+        this.handler = function () {
+            var max_chars = self.vm.$get(self.expression)
+            if (this.el.value.length > max_chars) {
+                this.el.value = this.el.value.substr(0, max_chars)
+            }
+        }.bind(this)
+        this.el.addEventListener('input', this.handler)
+    },
+    unbind: function () {
+        this.el.removeEventListener('input', this.handler)
+    }
+})

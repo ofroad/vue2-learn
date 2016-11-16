@@ -33,8 +33,13 @@ body{font-size:14px;}
   </span>
 </div>
 
+<div id="app-3">
+  <p v-if="seen">Now you see me</p>
+</div>
+
 <script src="vue-2.0.6.js"></script>
 <script type="text/javascript">
+//绑定dom文本到数据
 var app = new Vue({
   el: '#app',
   data: {
@@ -42,10 +47,19 @@ var app = new Vue({
   }
 });
 
+//绑定dom属性到数据
 var app2 = new Vue({
   el: '#app-2',
   data: {
     message: 'You loaded this page on ' + new Date()
+  }
+});
+
+//绑定 DOM 结构到数据
+var app3 = new Vue({
+  el: '#app-3',
+  data: {
+    seen: true
   }
 })
 </script>

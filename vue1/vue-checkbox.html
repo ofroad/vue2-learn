@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+</head>
+<body>
+    <!-- demo root element -->
+    <div id="demo">
+        <input type="checkbox" v-model="toggleAll" v-on:click="selectchange" />select all
+        <div v-for="item in array">
+            <input type="checkbox" v-model="checklist" :value="item" />{{item.id}}
+        </div>
+        <div>
+            <p>{{checklist|json}}</p>
+        </div>
+        <input type="checkbox" v-select-all="checklist" v-bind:array="array" />
+    </div>
+    <script src="http://cdn.jsdelivr.net/vue/1.0.12/vue.min.js"></script>
+    <script type="text/javascript">
+        'use strict';
+
+        Vue.directive('selectAll', {
+            params: ['array'],
+            twoWay: true,
+            bind: function () {
+                this.handler = function () {
+                    var arr = []
+                    if (this.el.checked) {
+                        this.params.array.forEach(function (item) {
+                            arr.push(item)
+                        })
+                    }
+                    this.set(arr)
+                }.bind(this)
+
+                this.el.addEventListener('click', this.handler)
+            },
+            update: function (newVal) {
+                var checked = newVal.length === this.params.array.length
+                this.el.checked = checked
+                this.el.indeterminate = !checked && newVal.length > 0
+            },
+            unbind: function () {
+                this.el.removeEventListener('click', this.handler)
+            }
+        })
+
+        // bootstrap the demo
+        var demo = new Vue({
+            el: '#demo',
+            data: {
+                checklist: [],
+                array: [
+                    { id: 1 },
+                    { id: 2 },
+                ],
+            },
+            methods: {
+                selectchange: function () {
+                    var selectall = this.toggleAll
+
+                    if (!selectall) {
+                        //push all here
+                        this.checklist = []
+
+                        for (var i = 0; i < this.array.length; i++) {
+                            this.checklist.push(this.array[i])
+                        }
+                    }
+                    else {
+                        this.checklist = []
+                    }
+                }
+            },
+            computed: {
+                toggleAll: function () {
+                    return this.checklist.length == this.array.length
+                }
+            }
+        })
+
+    </script>
+</body>
+</html>

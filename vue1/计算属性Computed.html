@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <script src="http://cdn.bootcss.com/vue/1.0.17/vue.min.js"></script>
+</head>
+<body>
+<div id="vueInstance">
+         输入1~10内的数字: <input type="text" v-model="value">
+         <p>计算结果：{{ resultMsg }}</p>
+</div>
+<script>
+      var V = new Vue({
+            el : '#vueInstance',
+            data : {
+                  value : null,
+                  randNum : 5//第一次随机数为5
+            },
+            methods : {
+                  getRandNum: function(min, max){
+                      return Math.floor(Math.random() * (max - min + 1)) + min;
+                  }
+            },
+            computed : {
+                  resultMsg : function(){
+                       if (this.value == this.randNum) {
+                            this.randNum = this.getRandNum(1, 10);
+                            return '你猜对了!';
+                       } else {
+                            this.randNum = this.getRandNum(1, 10);
+                            return '猜错了，再来!';
+                       }
+                  }
+            }
+      });
+</script>
+</body>
+</html>

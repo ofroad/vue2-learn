@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title></title>
+  <link rel="stylesheet" href="css/reset.css">
+  <script src="1.0.25/vue.js"></script>
+</head>
+<body>
+<style>
+  input{ border: 1px solid #ddd;}
+  .vueList{
+    width: 400px;
+    margin: 20px 0;
+  }
+  .vueList li{
+    display: flex;
+  }
+  .vueList li span{
+    flex: 1;
+    display: block;
+  }
+</style>
+<div id="example">
+  <my-component></my-component>
+</div>
+
+
+<div id="vueInstance">
+    <mine></mine>   
+    <mine></mine>
+    <mine></mine>
+</div>
+ 
+ <div id="ca">
+    <minea></minea>
+ </div>
+ <template id="mineTpl">
+         <p>My name is Appian.</p>
+         <button>点击没有任何事件</button>
+ </template>
+<script>
+//组件使用方法1
+// 定义
+var MyComponent = Vue.extend({
+  template: '<div>A custom component!</div>'
+});
+
+// 注册
+Vue.component('my-component', MyComponent);
+
+// 创建根实例
+new Vue({
+  el: '#example'
+});
+</script>
+
+<script>
+//组件使用方法2
+//为了让事件更简单，可以直接传入选项对象而不是构造器给 Vue.component() 和 component 选项。Vue.js 在背后自动调用 Vue.extend()：
+Vue.component('mine',{   //这里就是注册的内容
+   template : '<p>My name is Appian.</p>'
+});
+
+var V = new Vue({
+	 el : '#vueInstance'
+});
+</script>
+
+<script>
+//用template标签处理复杂组件
+/*
+现在你可能会想，我写的组件怎么可能只有一行p标签？一行p标签还有必要组件这么麻烦吗？是的，组件是为了更复杂的封装复用而生的。
+所以，如果你只会Vue.component()构造器中的template属性定义html代码，利用字符串拼接拼出所有的代码，这样只会让你比用jq更加疲惫不堪。
+*/
+/*
+为了避免上面的这种情况，所以我们可以用template标签（注意属性和标签是不一样的）来达到我们的目的。
+我们可以在页面的任何地方，定义template标签，并在template标签内，写好我们的模板。
+因为template标签在页面加载的时候不会渲染出来，只有在我们需要它的时候，这个标签内的内容才会被渲染出来。
+所以，你可以把template标签放在任何地方，并给它一个id，以便在组件注册的时候能够找到模板。
+*/
+Vue.component('minea',{   //这里就是注册的内容
+   template : '#mineTpl'
+});
+
+var V = new Vue({
+	 el : '#ca'
+});
+
+</script>
+
+<script>
+//通过props向组件中传递数据
+/*
+每次创建组件实例的时候，这个实例都划分了自己的组件范围，这个范围导致了在这个组件区域内无法获得其父组件的数据。
+所以，Vue是如何处理父组件向子组件中传递数据的呢？答案是，通过props。
+*/
+/*
+props不一定要是数组，也可以是对象。可以在对象中详细的定义很多props的限制条件。。
+*/
+Vue.component('mine',{  //这里就是注册的内容
+   template : '#mineTpl'
+});
+
+var V = new Vue({
+	 el : '#ca'
+});
+
+</script>
+
+</body>
+</html>

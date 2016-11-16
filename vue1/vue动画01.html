@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title></title>
+<link rel="stylesheet" href="css/reset.css">
+<style>
+.fade-transition {
+  transition: all 1s ease;
+  overflow: hidden;
+  visibility: visible;
+}
+
+.fade-enter, .fade-leave {
+  opacity: 0;
+  visibility: hidden;
+}
+</style>
+<script src="1.0.25/vue.js"></script>
+</head>
+<body>
+<h3>vue动画</h3>
+
+<div class="text">
+    <h1 v-show="show" transition="fade">Test</h1>
+</div>
+<h3>Status: <span style="color: red;">{{status}}</span></h3>
+
+
+
+
+<script>
+new Vue({
+	el: 'body',
+    data: {
+		show: false,
+        status: ""
+    },
+    transitions: {
+    	fade: {
+          beforeEnter(el) {
+            this.status = 'beforeEnter'
+          },
+          enter(el) {
+            this.status = 'enter'
+          },
+          afterEnter(el) {
+            this.status = 'afterEnter'
+          },
+          enterCancelled(el) {
+            // handle cancellation
+          },
+
+          beforeLeave(el) {
+            this.status = 'beforeLeave';
+			//alert("111")
+          },
+          leave(el) {
+            this.status = 'leave'
+          },
+          afterLeave(el) {
+            this.status = 'afterLeave'
+          },
+        }
+    },
+    ready() {
+		
+    	setTimeout( () => {
+        	this.show = true
+        	setTimeout( () => { 
+            	this.show = false
+            }, 2000) 
+        }, 1000)
+		
+    }
+})
+
+</script>
+
+</body>
+</html>

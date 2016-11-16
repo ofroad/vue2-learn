@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+</head>
+<body>
+
+    <div class='container' id="demo">
+        <textarea v-model="content"></textarea>
+        <div id="editor" v-ueditor="content" :config="config"></div>
+    </div>
+
+    <script src="http://apps.bdimg.com/libs/ueditor/1.4.3.1/ueditor.config.js"></script>
+    <script src="http://apps.bdimg.com/libs/ueditor/1.4.3.1/ueditor.all.js"></script>
+    <script src="http://apps.bdimg.com/libs/ueditor/1.4.3.1/lang/zh-cn/zh-cn.js"></script>
+    <script src="http://cdn.bootcss.com/vue/1.0.17/vue.min.js"></script>
+
+    <script type="text/javascript">
+        //http://vuejs.org.cn/guide/custom-directive.html
+        Vue.directive('ueditor', {
+            params: ['config'],
+            twoWay: true,
+            bind: function () {
+                var self = this;
+                this.el.id = 'ueditor' + new Date().getTime().toString()
+                this.editor = UE.getEditor(this.el.id, this.params.config)
+                this.editor.ready(function () {
+                    self.editorReady = true
+                    self.editor.addListener("contentChange", function () {
+                        self.set(self.editor.getContent())
+                    })
+                    self.update(self.vm.$get(self.expression))
+                })
+            },
+            update: function (newValue, oldValue) {
+                if (this.editorReady) {
+                    this.editor.setContent(newValue)
+                }
+            },
+            unbind: function () {
+                this.editor.destroy()
+            }
+        })
+
+        var vm = new Vue({
+            el: '#demo',
+            data: function () {
+                return {
+                    content: 'Hello Vue.js!',
+                    config: {
+                        toolbars: [
+                            ['fullscreen', 'source', 'undo', 'redo', 'bold']
+                        ]
+                    }
+                }
+            }
+        })
+    </script>
+</body>
+</html>

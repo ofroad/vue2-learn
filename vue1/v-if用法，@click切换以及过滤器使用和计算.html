@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title></title>
+  <link rel="stylesheet" href="css/reset.css">
+  <script src="1.0.25/vue.js"></script>
+</head>
+<body>
+<style>
+  input{ border: 1px solid #ddd;}
+  .vueList{
+    width: 400px;
+    margin: 20px 0;
+  }
+  .vueList li{
+    display: flex;
+  }
+  .vueList li span{
+    flex: 1;
+    display: block;
+  }
+</style>
+<div id="vueInstance">
+  <section v-if="loginStatus">
+    输入您的姓名：<input type="text" v-model="name"/>
+    <button v-on:click="say">欢迎点击</button>
+    <button @click="switchLoginStatus">退出登录</button>
+  </section>
+
+  <section v-if="!loginStatus">
+    您的姓名：<input type="text" v-model="name"/>
+    您的密码：<input type="password" v-model="pwd"/>
+    <button @click="switchLoginStatus">登录</button>
+  </section>
+</div>
+
+<script>
+var v = new Vue({
+  el : '#vueInstance',
+  data : {
+    name : 'bobobo',
+    loginStatus : false
+  },
+  methods : {
+    say : function(){
+      console.log("欢迎" + this.name)
+    },
+    switchLoginStatus : function(){
+      this.loginStatus = !this.loginStatus;
+    }
+  }
+});
+console.log(v.name)
+</script>
+
+<div class="vueList">
+    <ul>
+      <li>
+        <span>序号</span>
+        <span>价格</span>
+        <span>单位</span>
+        <span>总价：{{ sum }}</span>
+      </li>
+
+      <li v-for="(index,listCurrent) in list">
+        <span>{{ index + 1 }}</span>
+        <span>{{ listCurrent.price }}</span>
+        <span>{{ listCurrent.num }}</span>
+        <span>总价：{{ msg | discounta listCurrent.price listCurrent.num }}</span><!--此方法可行--><!--此用法要记住：使用过滤器计算并返回值 msg纯占位符作用，js中未定义-->
+      </li>
+    </ul>
+	
+	<ul>
+      <li>
+        <span>序号</span>
+        <span>价格</span>
+        <span>单位</span>
+        <span>总价：{{ sum }}</span>
+      </li>
+
+      <li v-for="(index,listCurrent) in list">
+        <span>{{ index + 1 }}</span>
+        <span>{{ listCurrent.price }}</span>
+        <span>{{ listCurrent.num }}</span>
+        <span>总价：{{ singsum }}</span><!--此方法不可行-->
+      </li>
+    </ul>
+	
+	<ul>
+      <li>
+        <span>序号</span>
+        <span>价格</span>
+        <span>单位</span>
+        <span>总价：{{ sum }}</span>
+      </li>
+
+      <li v-for="(index,listCurrent) in list">
+        <span>{{ index + 1 }}</span>
+        <span>{{ listCurrent.price }}</span>
+        <span>{{ listCurrent.num }}</span>
+        <span>总价：{{ singsumk(listCurrent.price,listCurrent.num) }}</span><!--此方法可行--><!--此用法要记住：直接定义方法并执行(可带参数也可不带参数)-->
+      </li>
+    </ul>
+  </div>
+<script>
+  var listCurrent = {
+    price:'', num:''
+  };
+  var list = [
+    { price:100, num:4 },
+    { price:110, num:14 },
+    { price:102, num:24 },
+    { price:140, num:34 },
+    { price:105, num:44 }
+  ];
+
+  var vm = new Vue({
+    el : '.vueList',
+    data : {
+     Current : listCurrent,
+      list: list
+    },
+	methods:{
+		singsumk:function(a,b){
+			return a*b;
+		}
+	},
+    computed : {
+      sum : function(){
+        var result = 0;
+        for (var i=0; i<list.length; i++){
+          result += Number(this.list[i].price) * Number(this.list[i].num);
+        }
+        return result;
+      },
+	  singsum:function(){
+		return listCurrent.price*listCurrent.num;//单条数据的总价的计算需要传参数，使用计算属性不能传参所以没法计算，只能使用过滤器(过滤器函数可以接收任意数量的参数：)
+	  }
+    },
+    filters: {//自定义的过滤器==定义在全局就能在所有的实例中调用过滤器，如果定义在了实例里就在实例里调用过滤器。
+      discounta : function(z,a,b){
+		console.log(z);//z为绑定的原始值
+		console.log(a);
+		console.log(b);
+		//console.log(a);
+        return a * b;
+      }
+    }
+  });
+</script>
+</body>
+</html>

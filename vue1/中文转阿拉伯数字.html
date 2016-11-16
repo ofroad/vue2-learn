@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <script src="http://cdn.bootcss.com/vue/1.0.17/vue.min.js"></script>
+</head>
+<body>
+<input type="text" v-model="ArabNum|thousandth">
+<script type="text/javascript">
+// js逻辑：
+var app = new Vue({
+    el: "#app",
+    data: {
+        ArabNum: 0,
+        ChineseNum: "",
+        //ChineseSymbole: ["零", "壹", "贰", "叁", "肆", "伍", "陆", "柒", "捌", "玖"],
+        ChineseSymbole: ["零", "一", "二", "三", "四", "五", "六", "七", "八", "九"],
+        ChineseSection: ["", "万", "亿", "万亿"],
+        //ChineseUnit: ["", "拾", "佰", "仟"],
+        ChineseUnit: ["", "十", "百", "千"],
+        ChineseUnitArab: {
+            "零": 0,
+            "一": 1,
+            "二": 2,
+            "三": 3,
+            "四": 4,
+            "五": 5,
+            "六": 6,
+            "七": 7,
+            "八": 8,
+            "九": 9,
+            "十": 10,
+            "百": 100,
+            "千": 1000,
+            "万": 10000,
+            "亿": 100000000,
+            "万亿": 1000000000000,
+        }
+    },
+    // 区别主要在这里：
+    filters: {
+        thousandth: {
+            read: function(v) {
+                var str = "";
+                while (v > 0) {
+                    var left = "" + (v % 1000);
+                    v = Math.floor(v / 1000);
+                    if (v > 0) {
+                        while (left.length < 3) {
+                            left = "0" + left;
+                        }
+                    }
+                    if (str == "") {
+                        str = left;
+                    } else {
+                        str = left + "," + str;
+                    }
+                }
+                return str;
+            },
+            write: function(v) {
+                return parseInt(v.replace(/,/g, ""));
+            },
+        },
+    },
+    methods: {
+        Arab2Chn: function(v) { ... },
+        Arab2Chn_section: function(v) { ... },
+        Chinese2Arab: function(str) { ... },
+        Chinese2Arab_section: function(str) { ... },
+    },
+    computed: { ... },
+})	
+</script>
+</body>
+</html>

@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title></title>
+<link rel="stylesheet" href="css/reset.css">
+<link rel='stylesheet prefetch' href='bootstrap.min.css'>
+<style>
+
+</style>
+<script src="1.0.25/vue.js"></script>
+</head>
+<body>
+<h1>vue绑定切换class</h1>
+<h3>对象语法--方式1</h3>
+<div id="demo1" class="static" v-bind:class="{ 'class-a': isA, 'class-b': isB }">fasdfasdfasd</div>
+<script>
+//然后可以在method里面控制isA/isB去切换显示class-a、class-b
+new Vue({
+	el: '#demo1',
+	data: {
+	  isA: true,
+	  isB: false
+	}
+});
+</script>
+
+<h3>对象语法--方式2</h3>
+<div id="demo2" v-bind:class="classObject">5234523vgsdfgtsd</div>
+<script>
+new Vue({
+	el: '#demo2',
+	data: {
+	  classObject: {
+		'class-a': false,
+		'class-b': true
+	  }
+	}
+});
+</script>
+
+<h3>对象语法--方式3</h3>
+<div id="demo21" class="static" v-bind:class="{ 'class-a' : isA, 'class-b': !isA}" @click="toggle">333333344444444444444444333</div>
+<script>
+new Vue({
+	el: '#demo21',
+	data: {
+	  isA:false
+	},
+	methods:{
+		toggle:function(){
+			this.isA = !this.isA;
+		}
+	}
+});
+</script>
+
+
+<h3>数组语法--方式1</h3>
+<div id="demo3" v-bind:class="[classA, classB]">啊啊啊啊啊啊啊啊啊啊</div>
+<script>
+new Vue({
+	el: '#demo3',
+	data: {
+	  classA: 'class-a',
+	  classB: 'class-b'
+	}
+});
+</script>
+
+<h3>数组语法--方式2</h3>
+<div id="demo4" v-bind:class="['aa', isB ? 'bb' : '']">1111111111111111</div>
+<script>
+//此例始终添加 aa isB 是 true 时添加 bb 。
+new Vue({
+	el: '#demo4',
+	data: {
+	  isB: true
+	}
+});
+</script>
+
+<h3>对象与数组混用语法-</h3>
+<div id="demo5" v-bind:class="[classA, { 'classB': isB, 'classC': isC }]">222222222</div>
+<script>
+//此例始终添加 aa isB 是 true 时添加 bb 。
+new Vue({
+	el: '#demo5',
+	data: {
+	  classA: 'class-a',
+	  isB: true,
+	  isC:true
+	}
+});
+</script>
+
+<h3>字符串语法--方式</h3>
+<div id="demo22" class="static" v-bind:class="isA ? 'class-a': 'class-b'" @click="toggle">44444444466666444444</div>
+<script>
+new Vue({
+	el: '#demo22',
+	data: {
+	  isA:false
+	},
+	methods:{
+		toggle:function(){
+			this.isA = !this.isA;
+		}
+	}
+});
+</script>
+
+
+<h3>循环中切换</h3>
+<ul id="demo6">
+	 <li class="weui_navbar_item" v-for="tab in tabs" v-bind:class="{'active':$index===selected}" @click="choose($index)">{{tab.tabName}}</li>
+</ul>
+<script>
+new Vue({
+	el: '#demo6',
+	data: {
+	  tabs: [
+		  { tabName: 'Learn JavaScript' },
+		  { tabName: 'Learn Vue.js' },
+		  { tabName: 'Build Something Awesome' }
+	  ],
+	  selected:0
+	},
+	methods:{
+		choose:function(index){
+			console.log("index--"+index);
+			this.selected=index;
+		}
+	}
+});
+</script>
+</body>
+</html>

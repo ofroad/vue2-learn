@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <link href="http://cdn.bootcss.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class='container-fluid' id="demo">
+        <div class="row" style="width:1000px;">
+            <div v-resize="changed()" class="col-md-1">.col-md-1</div>
+            <div class="col-md-1">.col-md-1</div>
+            <div class="col-md-1">.col-md-1</div>
+            <div class="col-md-1">.col-md-1</div>
+            <div class="col-md-1">.col-md-1</div>
+            <div class="col-md-1">.col-md-1</div>
+            <div class="col-md-1">.col-md-1</div>
+            <div class="col-md-1">.col-md-1</div>
+            <div class="col-md-1">.col-md-1</div>
+            <div class="col-md-1">.col-md-1</div>
+            <div class="col-md-1">.col-md-1</div>
+            <div class="col-md-1">.col-md-1</div>
+        </div>
+        <div class="row">
+            <div class="col-md-8">.col-md-8</div>
+            <div class="col-md-4">.col-md-4</div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">.col-md-4</div>
+            <div class="col-md-4">.col-md-4</div>
+            <div class="col-md-4">.col-md-4</div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">.col-md-6</div>
+            <div class="col-md-6">.col-md-6</div>
+        </div>
+    </div>
+
+    <script src="http://apps.bdimg.com/libs/ueditor/1.4.3.1/ueditor.config.js"></script>
+    <script src="http://apps.bdimg.com/libs/ueditor/1.4.3.1/ueditor.all.js"></script>
+    <script src="http://apps.bdimg.com/libs/ueditor/1.4.3.1/lang/zh-cn/zh-cn.js"></script>
+    <script src="http://cdn.bootcss.com/vue/1.0.17/vue.min.js"></script>
+
+    <script type="text/javascript">
+        'use strict'
+
+        //http://vuejs.org.cn/guide/custom-directive.html
+        Vue.directive('resize', {
+            bind: function () {
+                this.handler = function () {
+                    var width = this.el.offsetWidth
+
+                    if (this.width === width) {
+
+                    }
+                    else {
+                        console.log(this.width, width)
+                        this.width = width
+                        this.vm.$get(this.expression)
+                    }
+                }.bind(this)
+
+                window.addEventListener('resize', this.handler)
+            },
+            update: function (newValue, oldValue) {
+
+            },
+            unbind: function () {
+                window.removeEventListener('resize', this.handler)
+            }
+        })
+
+        var vm = new Vue({
+            el: '#demo',
+            methods: {
+                changed() {
+                    console.log('resize')
+                },
+            }
+        })
+    </script>
+</body>
+</html>

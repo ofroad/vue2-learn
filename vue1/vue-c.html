@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <script src="http://cdn.bootcss.com/vue/1.0.17/vue.min.js"></script>
+</head>
+<body>
+    <div id="demo">
+        <input v-for="item in 3" v-focus-next.literal="3" />
+    </div>
+    <script type="text/javascript">
+        Vue.directive('focusNext', {
+            bind: function () {
+                this.handler = function () {
+                    if (this.el.value.length >= this.expression) {
+                        var next = this.el.nextSibling;
+                        next.focus();
+                    }
+                }.bind(this)
+                this.el.addEventListener('input', this.handler)
+            },
+            unbind: function () {
+                this.el.removeEventListener('input', this.handler)
+            }
+        })
+        var vm = new Vue({
+            el: '#demo',
+        })
+    </script>
+</body>
+</html>

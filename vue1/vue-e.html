@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Document</title>
+    </head>
+    <body>
+        <div id="app">
+            <ul>
+                <li v-for="one in arr">
+                    {{one}}
+                </li>
+            </ul>
+            <button @click="foo">foo</button>
+            <button @click="bar">bar</button>
+        </div>
+    </body>
+    <script src="1.0.25/vue.js"></script>
+    <script>
+        new Vue({
+            el:'#app',
+            data:function() {
+                return {
+                    arr:[1,2,3,4,5]
+                }
+            },
+            methods:{
+                foo:function(){
+                    this.arr[1] = 10;
+                },
+                bar:function(){
+                    this.arr.splice(1,1,10);
+                }
+            }
+        })
+    </script>
+    </html>

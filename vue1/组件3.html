@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title></title>
+  <link rel="stylesheet" href="css/reset.css">
+  <script src="1.0.25/vue.js"></script>
+</head>
+<body>
+<style>
+  input{ border: 1px solid #ddd;}
+  .vueList{
+    width: 400px;
+    margin: 20px 0;
+  }
+  .vueList li{
+    display: flex;
+  }
+  .vueList li span{
+    flex: 1;
+    display: block;
+  }
+  .up,.down{cursor:pointer;}
+  .disabled {
+    color : orange;
+}
+</style>
+
+<div id="vueInstance">
+    <div class="container">
+        <ul>
+			<!--postk是循环的单条数据，将值传给posta /自定义组件可以像普通元素一样直接使用 v-for 但是，不能传递数据给组件，因为组件的作用域是孤立的。为了传递数据给组件，应当使用 props 做数据赋值绑定 比如
+			将$index绑定给bindex，将postk绑定给posta
+			-->
+           <post v-for="postk in posts" :posta="postk" :bindex="$index"></post>
+        </ul>
+		<div id="commentBox">
+            请输入评论内容并提交：
+            <input type="text" v-model="comment" @keyup.enter="postComment">
+            <button @click="postComment">提交评论</button>
+        </div>
+    </div>
+</div>
+<template id="postTpl"><!--posta代表单条数据-->
+    <li>
+	 <i class="up" @click="upvote" :class="{disabled: upvoted}">我支持</i>
+	 <span>票数： {{votes}}</span>
+	 <i class="down" @click="downvote" :class="{disabled: downvoted}">我反对</i>
+	 <a>话题： {{ posta.title }}</a>
+   </li>
+</template>
+<script>
+//通过props向组件中传递数据
+/*
+每次创建组件实例的时候，这个实例都划分了自己的组件范围，这个范围导致了在这个组件区域内无法获得其父组件的数据。
+所以，Vue是如何处理父组件向子组件中传递数据的呢？答案是，通过props。
+*/
+Vue.component('post',{
+    template : '#postTpl',
+    props : ['posta'],//定义向此组件传递的数据
+	/*
+	注意，data里面的两个布尔值的定义是作为一个函数的返回值定义的。那是因为我们想要给每一个组件都设置一个是否投票的状态。
+（还记得之前我说过，这次的列表渲染是循环渲染多个模板，每个模板都只是一个话题的相关信息，
+而现在在组件中定义的data：upvoted和downvoted，也是专属于某个模板的。）
+这样我们如果投了某个话题的赞成票，并不会影响剩下话题的投票情况。
+	*/
+	data : function (){
+        return {  //组件里面data必须为function，定义投票状态
+            upvoted: false,
+            downvoted: false
+        }
+    },
+    methods : {
+        upvote : function() { //点击赞成的事件
+            this.upvoted = !this.upvoted;
+            this.downvoted = false;
+        },
+        downvote: function() { //点击反对的事件
+            this.downvoted = !this.downvoted;
+            this.upvoted = false;
+        }
+    },
+	computed: {  //重点部分
+        votes: function () {
+            if (this.upvoted) {
+                return this.posta.votes + 1;
+            } else if (this.downvoted) {
+                return this.posta.votes - 1;
+            } else {
+                return this.posta.votes;
+            }
+        }
+    }
+});
+ var V = new Vue({
+	 el : '#vueInstance',
+	 data : {
+		 posts: [{
+			title: '请大大多多为我投票，我给大家发红包',
+			votes: 15
+		 },{
+			title: '投我准没错',
+			votes: 53
+		 },{
+			title: '不要投给我楼上的',
+			votes: 10
+		 }],
+		 comment: ''
+	 },
+	 methods:{
+		postComment:function() {
+             this.posts.push({
+               title: this.comment,
+               votes: 0
+             })
+             this.comment = '';
+        }
+	 }
+});
+/*
+利用 props，子组件可以定义需要父级传递的字段
+利用 'v-bind:' 或 ':' 在自定义标签的地方绑定父级指派的字段
+组件的 data 和 el 必须定义为function，这样所有实例不会共享元素和data。
+不要忘记，还是需要将Vue实例化，才能使用组件。
+*/
+</script>
+
+
+</body>
+</html>

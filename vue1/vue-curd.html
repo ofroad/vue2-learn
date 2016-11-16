@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title></title>
+<link rel="stylesheet" href="css/reset.css">
+<link rel='stylesheet prefetch' href='bootstrap.min.css'>
+<style>
+.dialog {
+    width: 350px;
+    position: fixed;
+    left: 50%;
+    top: 2em;
+    transform: translateX(-50%);
+    z-index: 2000;
+    visibility: hidden;
+    backface-visibility: hidden;
+    perspective: 1300px;
+}
+
+.dialog-active {
+    visibility: visible;
+}
+
+.dialog-active .dialog-content {
+    opacity: 1;
+    transform: rotateY(0);
+}
+
+.dialog-active ~ .dialog-mask {
+    opacity: 1;
+    visibility: visible;
+}
+
+.dialog-content {
+    border-radius: 3px;
+    background: #fff;
+    overflow: hidden;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    transition: .5s ease-in-out;
+    opacity: 0;
+    transform-style: preserve-3d;
+    transform: rotateY(-70deg);
+}
+
+.dialog-header {
+    background: #0090d3;
+    color: #fff;
+}
+
+.dialog-title {
+    margin: 0;
+    font-size: 2em;
+    text-align: center;
+    font-weight: 200;
+    line-height: 2em;
+}
+
+.dialog-body {
+    padding: 2em;
+}
+
+.dialog-footer {
+    margin: 0 2em;
+    padding: 1em 0;
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.dialog-mask {
+    content: "";
+    position: fixed;
+    visibility: hidden;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1000;
+    opacity: 0;
+    background: rgba(0, 0, 0, 0.5);
+    transition: all .6s;
+}
+.form-horizontal .form-group {
+    margin-right: 15px;
+    margin-left: 15px;
+}
+</style>
+<script src="1.0.25/vue.js"></script>
+</head>
+<body>
+<h3>curd</h3>
+
+<div id="app">
+   <div class="container">
+     <div class="input-group">
+       <span class="input-group-addon">查询</span>
+       <input class="form-control" v-model="searchQuery" type="text" name="" id="" />
+     </div>
+     
+  </div>
+  <div class="container">
+    <grid-s :list="list" :colums="colums" :search-Query="searchQuery"></grid-s>
+  </div>
+</div>
+<template id="grid-tpl">
+  <dialog-s :index="index" :mode="mode" :fields="colums" :title="title" :item="item" @create-item="createItem" @modify-item="modifyItem"></dialog-s>
+  <table class="table">
+    <thead>
+      <tr>
+        <th v-for="col in colums">
+          {{col.title}}
+        </th>
+        <th>操作</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr v-for="(index,item) in list|filterBy searchQuery">
+        <td v-for="col in colums">
+          {{item[col.title]}}
+        </td>
+        <td>
+          <button @click="openModifyItemDialog(item,index)"  class="btn btn-success btn-xs">修改</button>
+          <button @click="delItem(index)"  class="btn btn-danger btn-xs">删除</button></td>
+      </tr>
+    </tbody>
+  </table>
+  <div class="container">
+        <button class="btn btn-success" @click="openNewItemDialog('新增')">新增</button>
+    </div>
+</template>
+<template id="dialog-tpl">
+  <div class="dialogs">
+    <div class="dialog" :class="{'dialog-active':show}">
+      <div class="dialog-content">
+        <header class="dialog-header">
+          <h1 class="dialog-title">{{title}}</h1>
+        </header>
+        <div class="form-horizontal">
+        <div v-for="field in fields" class="form-group">
+          <label>{{field.title}}</label>
+          <input class="form-control" v-model="item[field.title]" type="text" name="" id="" />
+        </div>
+          </div>
+        <footer class="dialog-footer">
+          <div class="footer-btn">
+            <button @click="save" class="btn btn-success">保存</button>
+            <button @click="close" class="btn btn-danger">取消</button>
+          </div>
+        </footer>
+      </div>
+    </div>
+    <div class="dialog-mask"></div>
+  </div>
+</template>
+
+
+<script>
+Vue.component("grid-s",{
+  template:"#grid-tpl",
+  props:["list","colums","searchQuery"],
+  data:function(){
+    return {
+      mode:0,
+      item:{},
+      title:"",
+      index:0
+    }
+  },
+  methods:{
+    openNewItemDialog:function(title){
+      this.title=title;
+      this.mode=1;
+      this.item={};
+      this.$broadcast('showDialog', true);
+    },
+    createItem:function(){
+      this.list.push(this.item);
+      this.$broadcast('showDialog', false);
+      wilddog.set(item);
+      this.item = {};
+    },
+    delItem:function(index){
+      this.list.splice(index,1);
+    },
+    modifyItem:function(){
+      for (var j in this.item) {
+           this.list[this.index][j] = this.item[j]
+      }
+      this.$broadcast('showDialog', false);
+      this.item = {};
+    },
+    openModifyItemDialog:function(item,index){
+      this.title="Edit "+item.title;
+      this.mode=2;
+      this.item=_.cloneDeep(item);
+      this.index=index;
+      this.$broadcast('showDialog', true);
+    }
+    
+  },
+  components:{
+    "dialog-s":{
+      template:"#dialog-tpl",
+      props:["mode","title","fields","item","index"],
+      data:function(){
+        return {
+          show:false
+        }
+      },
+      methods:{
+        close:function(){
+          this.show=false;
+        },
+        save:function(){
+          if(this.mode==1){
+            this.$dispatch('create-item');
+          }
+          else{
+            this.$dispatch('modify-item');
+          }
+        }
+      },
+      events:{
+        'showDialog': function(show) {
+                    this.show = show;
+                }
+      }
+    }
+  }
+});
+var demo=new Vue({
+  el:"#app",
+  data:{
+    searchQuery:'',
+    colums:[{title:"title"},{title:"sku"},{title:"price"}],
+    list:[{
+      title:"sony",
+      sku:"23232323A",
+      price:5000
+    },{
+      title:"Apple",
+      sku:"45454545A",
+      price:6000
+    }]
+}
+});
+</script>
+
+</body>
+</html>

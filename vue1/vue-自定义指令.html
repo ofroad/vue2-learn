@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <script src="1.0.26/vue.js"></script>
+	<style>
+*{
+	margin:0;
+	padding:0;
+}
+#main{
+    width:432px;
+    margin:0 auto;
+    text-align:center;
+}
+nav{
+	display:inline-block;
+	margin:60px auto 45px;
+	background-color:#5597b4;
+	box-shadow:0 1px 1px #ccc;
+	border-radius:2px;
+}
+nav a{
+	display:inline-block;
+	padding: 18px 30px;
+	color:#fff !important;
+	font-weight:bold;
+	font-size:16px;
+	text-decoration:none !important;
+	line-height:1;
+	background-color:transparent;
+	-webkit-transition:background-color 0.25s;
+	-moz-transition:background-color 0.25s;
+	transition:background-color 0.25s;
+    cursor:pointer;
+}
+b{
+    display:inline-block;
+	padding:5px 10px;
+	background-color:#c4d7e0;
+	border-radius:2px;
+	font-size:18px;
+}
+.show{
+    background-color:#e35885;
+}
+	</style>
+</head>
+<body>
+<div id="demo">
+    <div id="kk" v-my-directive="msg">123</div>
+</div>
+
+<div id="example" v-demo:args="message" v-on:click="onClick">qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq</div>
+<script>
+/*
+Vue.js 允许你注册自定义指令，实质上是让你教 Vue 一些新技巧：怎样将数据的变化映射到 DOM 的行为。
+你可以使用Vue.directive(id, definition)的方法传入指令id和定义对象来注册一个全局自定义指令。
+*/
+Vue.directive('my-directive', {
+  bind: function () {//只调用一次，在指令第一次绑定到元素上时调用。
+    // 准备工作
+    // 例如，添加事件处理器或只需要运行一次的高耗任务
+	//console.log(this);//所有的钩子函数将被复制到实际的指令对象中，钩子内 this 指向这个指令对象。
+	//console.log(this.el.id);//kk
+	this.el.style.color = '#ccc'
+    //this.el.style.backgroundColor = this.arg
+  },
+  update: function (newValue, oldValue) {//在 bind 之后立即以初始值为参数第一次调用，之后每当绑定值变化时调用，参数为新值与旧值。
+    // 根据获得的新值执行对应的更新
+    // 也会以初始值为参数调用一次
+	//console.log(this);
+	//el: 指令绑定的元素
+	//vm: 拥有该指令的上下文 ViewModel
+	//expression: 指令的表达式，不包括参数和过滤器
+	//arg: 指令的参数
+	//raw: 未被解析的原始表达式
+	//name: 不带前缀的指令名
+	//modifiers: 一个对象，包含指令的修饰符。
+	//descriptor: 一个对象，包含指令的解析结果。
+	this.el.innerHTML =
+                    'name - '       + this.name + '<br>' +
+                    'raw - '        + this.descriptor.raw + '<br>' +
+                    'expression - ' + this.expression + '<br>' +
+                    'argument - '   + this.arg + '<br>' +
+                    'value - '      + newValue;
+  },
+  unbind: function () {//只调用一次，在指令从元素上解绑时调用。
+    // 清理工作
+    // 例如，删除 bind() 添加的事件监听器
+	//console.log(this);
+  }
+});
+
+var demo = new Vue({
+        el: '#demo',
+        data: {
+            msg: 'hello!'
+        }
+    })
+</script>
+
+<script>
+Vue.directive('demo', {
+    acceptStatement: true,
+    bind: function(){
+        this.el.style.cssText = 'color: red; background: #666;';
+    },
+    update: function(newVal, oldVal){
+        this.el.innerHTML= 'name = ' + this.name + '<br/>' + 
+            'arg = ' + this.arg + '<br/>' + 
+            'expression= ' + this.expression+ '<br/>';
+        console.log(this.vm.$data);
+        console.log(this.el === this.vm.$el);
+    }
+});
+var demo = new Vue({
+    el: '#example',
+    data: {
+        message: 'hello world!'
+    },
+    methods: {
+        onClick: function(){
+            // custom directive update will be called.
+            this.$data.message = 'hahaha!';
+        }
+    },
+	init:function(){//在实例开始初始化时同步调用。此时数据观测、事件和 watcher 都尚未初始化。
+		console.log("init event");
+		//console.log(this);
+		//console.log(this.$el);
+	},
+	created:function(){//在实例创建之后同步调用。此时实例已经结束解析选项，这意味着已建立：数据绑定，计算属性，方法，watcher/事件回调。但是还没有开始 DOM 编译，$el 还不存在。
+		console.log("created event");
+		console.log(this);
+		console.log(this.$el);
+		
+	},
+	beforeCompile:function(){//在编译开始前调用。
+		console.log("beforeCompile event");
+	},
+	compiled:function(){//在编译结束后调用。此时所有的指令已生效，因而数据的变化将触发 DOM 更新。但是不担保 $el 已插入文档。
+		console.log("compiled event");
+	},
+	ready:function(){//在编译结束和 $el 第一次插入文档之后调用，如在第一次 attached 钩子之后调用。注意必须是由 Vue 插入（如 vm.$appendTo() 等方法或指令更新）才触发 ready 钩子。
+		console.log("ready event");
+		//console.log(this);
+		//console.log(this.$el);
+	},
+	attached:function(){//在 vm.$el 插入 DOM 时调用。必须是由指令或实例方法（如 $appendTo()）插入，直接操作 vm.$el 不会 触发这个钩子。
+		console.log("attached event");
+	},
+	detached:function(){//在 vm.$el 从 DOM 中删除时调用。必须是由指令或实例方法删除，直接操作 vm.$el 不会 触发这个钩子。
+		console.log("detached event");
+	},
+	beforeDestroy:function(){//在开始销毁实例时调用。此时实例仍然有功能。
+		console.log("beforeDestroy event");
+	},
+	destroyed:function(){//在实例被销毁之后调用。此时所有的绑定和实例的指令已经解绑，所有的子实例也已经被销毁。如果有离开过渡，destroyed 钩子在过渡完成之后调用。
+		console.log("destroyed event");
+	}
+});
+</script>
+</body>
+</html>

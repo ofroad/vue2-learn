@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+</head>
+<body>
+    <!-- demo root element -->
+    <div id="demo">
+        <input type="number" v-timer="t1" increase="1" interval="500" v-model="t1" number />
+        <input type="number" v-timer="t2" increase="2" interval="1000" v-model="t2" number />
+    </div>
+    <script src="http://cdn.jsdelivr.net/vue/1.0.12/vue.min.js"></script>
+    <script type="text/javascript">
+        'use strict';
+
+        Vue.directive('timer', {
+            params: ['increase', 'interval'],
+            twoWay: true,
+            bind() {
+                this.flag = true
+                var increase = parseInt(this.params.increase)
+                var interval = parseInt(this.params.interval)
+
+                var self = this
+
+                function timeout() {
+                    setTimeout(() => {
+                        var num = self.vm.$get(self.expression) || 0
+                        self.set(num + increase)
+                        if (self.flag)
+                            timeout()
+                    }, interval)
+                }
+
+                timeout()
+            },
+            unbind() {
+                this.flag = false
+            }
+        })
+
+        // bootstrap the demo
+        var demo = new Vue({
+            el: '#demo'
+        })
+    </script>
+</body>
+</html>

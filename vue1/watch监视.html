@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title></title>
+  <link rel="stylesheet" href="css/reset.css">
+  <script src="1.0.25/vue.js"></script>
+</head>
+<body>
+<style>
+  input{ border: 1px solid #ddd;}
+  .vueList{
+    width: 400px;
+    margin: 20px 0;
+  }
+  .vueList li{
+    display: flex;
+  }
+  .vueList li span{
+    flex: 1;
+    display: block;
+  }
+  .up,.down{cursor:pointer;}
+  .disabled {
+    color : orange;
+}
+</style>
+
+
+<script>
+//watch注意用来监视数据的变化==每当该数据发生变化时，watch方法都会被触发。
+var vm = new Vue({
+  data: {
+    a: 1,
+	c: {
+        aaq: 'xx'
+    }
+  },
+  watch: {//一个对象，键是观察表达式，值是对应回调。值也可以是方法名，或者是对象，包含选项。
+    'a': function (val, oldVal) {//回调的参数为新值和旧值
+      console.log('new: %s, old: %s', val, oldVal)
+    },
+    // 方法名
+    //'b': 'someMethod',
+    // 深度 watcher
+    'c': {
+      handler: function (val, oldVal) {
+		//console.log('new: %s, old: %s', val.aaq, oldVal.aaq);
+	  },
+      deep: true//深度监视
+    }
+  }
+})
+vm.a = 2 // -> new: 2, old: 1
+//vm.c.aaq="hhh";
+
+vm.$watch('c', function(val, oldVal){//注意：在修改（不是替换）对象或数组时，旧值将与新值相同，因为它们索引同一个对象/数组。Vue 不会保留修改之前值的副本。
+	console.log('new: %s, old: %s', val.aaq, oldVal.aaq);
+	console.log("监视对象或数组时，如果数据发生变化，旧值将与新值相同，会触发此回调，如果没有发生变化，不会触发回调");
+}, {deep: true});
+vm.c.aaq = "xx1"
+</script>
+
+
+</body>
+</html>

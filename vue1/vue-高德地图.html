@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <link href="http://cdn.bootcss.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet" />
+	<script src="http://webapi.amap.com/maps?v=1.3&key=bfe31f4e0fb231d29e1d3ce951e2c780&callback=initTheMap"></script>
+
+    <!--<script src="https://webapi.amap.com/maps?v=1.3&key=76f167aa351abefe78920b55777f9be6"></script>-->
+
+    <script src="http://cdn.bootcss.com/vue/1.0.17/vue.js"></script>
+    <script src="http://cdn.bootcss.com/vue-strap/1.0.11/vue-strap.min.js"></script>
+</head>
+<body>
+    <div id="app">
+
+        <p>{{position|json}}</p>
+
+        <div class="input-group">
+            <input type="text" class="form-control" v-model="q" @keyup.enter="search(q)" placeholder="Search for...">
+            <span class="input-group-btn">
+                <a class="btn btn-default" @click="search(q)">Go!</a>
+            </span>
+        </div><!-- /input-group -->
+        <br />
+        <gd-map @map-click="map_click" :position.once="position" style="height:600px;"></gd-map>
+    </div>
+
+    <template id="map_modal">
+        <modal :show.sync="show">
+            <div slot="modal-header" class="modal-header">
+                <h4 class="modal-title">选择坐标</h4>
+            </div>
+            <div slot="modal-body" class="modal-body">
+                <div class="input-group">
+                    <input type="text" class="form-control" v-model="q" @keyup.enter="search(q)" placeholder="Search for...">
+                    <span class="input-group-btn">
+                        <a class="btn btn-default" @click="search(q)">Go!</a>
+                    </span>
+                </div>
+                <br />
+                <gd-map @map-click="map_click" :position.once="position" :style='{ height:"400px", }'></gd-map>
+            </div>
+            <div slot="modal-footer" class="modal-footer">
+                <button type="button" class="btn btn-default" @click='cancel()'>取消</button>
+                <button type="button" class="btn btn-success" @click='submit()'>确定</button>
+            </div>
+        </modal>
+    </template>
+
+    
+
+    <script>
+        'use strict';
+
+        Vue.component('gdMap', {
+            props: ['position'],
+            template: '<div></div>',
+            replace: true,
+            ready() {
+                this.map = new AMap.Map(this.$el, {
+                    resizeEnable: true,
+                    zoom: 12,
+                })
+
+                var self = this
+
+                if (this.position.lng && this.position.lat) {
+                    var center = [this.position.lng, this.position.lat]
+                    this.map.setCenter(center)
+                    this.marker = new AMap.Marker({ map: self.map })
+                    this.marker.setPosition(center)
+                }
+
+                this.map.on('click', function (e) {
+                    self.$dispatch('map-click', e)
+
+                    if (!self.marker) {
+                        self.marker = new AMap.Marker({ map: self.map })
+                    }
+
+                    self.marker.setPosition([e.lnglat.getLng(), e.lnglat.getLat()])
+                })
+            },
+            events: {
+                'setCenter'(center) {
+                    if (!this.map) return
+                    this.map.setCenter(center)
+                },
+            },
+        })
+
+        new Vue({
+            el: '#app',
+            data: function () {
+                return {
+                    q: null,
+                    position: {}
+                }
+            },
+            methods: {
+                search(q) {
+                    var self = this
+
+                    AMap.service(["AMap.PlaceSearch"], function () {
+                        var placeSearch = new AMap.PlaceSearch({ //构造地点查询类
+                            pageSize: 1,
+                            pageIndex: 1,
+                            //city: "010", //城市
+                            //map: self.map,
+                            //panel: "panel"
+                        })
+
+                        //关键字查询
+                        placeSearch.search(q, function (status, result) {
+                            //TODO : 按照自己需求处理查询结果
+                            var poiList = result.poiList
+
+                            if (poiList.count > 0) {
+                                var p = poiList.pois[0]
+                                self.$broadcast('setCenter', [p.location.lng, p.location.lat])
+                            }
+                        })
+                    })
+                },
+                map_click (e) {
+                    this.$set('position.lat', e.lnglat.getLat())
+                    this.$set('position.lng', e.lnglat.getLng())
+                }
+            },
+            components: {
+                modal: VueStrap.modal
+            }
+        })
+
+    </script>
+
+</body>
+</html>

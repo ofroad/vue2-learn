@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Document</title>
+		<style>
+		* {
+          margin: 0;
+          padding: 0;
+          font-size: 14px;
+        }
+        
+        #vue-dingyi-paging ul {
+          list-style: none;
+          margin-top: 10px;
+        }
+        
+        #vue-dingyi-paging ul li {
+          margin: 0 5px;
+        }
+        
+        #vue-dingyi-paging ul li,
+        .pageLink {
+          display: inline-block;
+          width: 40px;
+          height: 40px;
+          background: #F0F0F0;
+          color: #ABABAB;
+          border-radius: 3px;
+          text-align: center;
+          text-decoration: none;
+          line-height: 40px;
+        }
+        
+        #vue-dingyi-paging ul li .pageLink:hover {
+          background: #ABABAB;
+          color: #FFFFFF;
+        }
+        
+        #vue-dingyi-paging ul li .curPage {
+          background: #81C06F;
+          color: #FFFFFF;
+        }
+		</style>
+    </head>
+    <body>
+	<div id="vue-dingyi-paging">
+		<ul>
+			<li>
+				<a class="pageLink" href="#" @click="setPage(curNum-1)">&lt;</a>
+			</li>
+			<li v-for="n in totalNum">
+				<a class="pageLink" href="#" v-text="n+1" @click="setPage(n+1)" :class="{ curPage: n+1 == curNum }"></a>
+			</li>
+			<li><a class="pageLink" href="#" @click="setPage(curNum+1)">&gt;</a></li>
+		</ul>
+	</div>
+    </body>
+    <script src="1.0.25/vue.js"></script>
+    <script>
+       new Vue({
+		  el: '#vue-dingyi-paging',
+		  data: {
+			totalNum: 6, //总页数
+			curNum: 1 //当前页码
+		  },
+		  methods: {
+			//切换页码
+			setPage: function(num) {
+			  //页码小于等于1
+			  if (num <= 1) {
+				return this.curNum = 1;
+			  }
+			  //页码大于总页数
+			  if (num >= this.totalNum) {
+				return this.curNum = this.totalNum;
+			  }
+			  //页码赋给当前页
+			  this.curNum = num;
+			}
+		  }
+		})
+    </script>
+    </html>

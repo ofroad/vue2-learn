@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>vue tab </title>
+<style>
+html,body,p,ul,li,dl,dt,dd,ol,h1,h2,h3,h4,h5{padding: 0; margin: 0;}
+img{border: 0;}
+ul,li{list-style: none;}
+a{color: #4D647C; text-decoration: none;}
+a:hover{color: #44C5D0;}
+a.highlight:hover{color: #00a6ab;}
+.highlight{color: #44c5d0;}
+.tint{color: #87a4b6;}
+h2{color: #8ba4c0;}
+label{color: #4d647c;}
+body{font: 14px/1.6 arial, "microsoft yahei"; color: #8ba4be; }
+body{font-size:14px;}
+#app ul{height:30px;}
+#app li{float:left; margin:0 10px 0 0;}
+.weui_navbar_item{color:#cccccc;}
+.weui_bar_item_on{color:#ff0000;}
+</style>
+</head>
+<body>
+<div id="app">
+	<ul>
+		 <li class="weui_navbar_item" v-for="tab in tabs" v-bind:class="{'weui_bar_item_on':$index===selected}" @click="choose($index)">{{tab.tabName}}</li>
+	</ul>
+	<div>
+		<!--
+		<div v-show="0===current_view">1</div>
+		<div v-show="1===current_view">2</div>
+		<div v-show="2===current_view">3</div>
+		-->
+		<div v-for="t in content" v-show="$index===selected">{{t.txt}}</div>
+	</div>
+</div>
+<script src="../1.0.25/vue.js"></script>
+<script type="text/javascript">
+new Vue({
+  el: '#app',
+  data: {
+    tabs: [
+      { tabName: 'Learn JavaScript' },
+      { tabName: 'Learn Vue.js' },
+      { tabName: 'Build Something Awesome' }
+    ],
+	content:[
+		{txt:"1625"},
+		{txt:"2fhf"},
+		{txt:"336"}
+	],
+	selected:0,
+	current_view:0
+  },
+  methods:{
+	choose:function(index){
+		console.log("index--"+index);
+		this.selected=index;//核心 用来高亮tab以及显示对应的tab内容
+		//this.current_view=index;
+		console.log("this.selected--"+this.selected);
+		console.log("this.current_view--"+this.current_view);
+	}
+  }
+});
+</script>
+</body>
+</html>

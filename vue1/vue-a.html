@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+</head>
+<body>
+ 
+    <app :source="[{name: 'A'}, {name: 'B'}, {name: 'C'}, {name: 'D'}, {name: 'B'}, {name: 'E'}, {name: 'F'}]"
+         :columns="[{key: 'name', text: '名稱'}]"
+         :paginator-size="10"
+         :size="3"></app>
+ 
+    <template id="app">
+        <div class="u-table-container">
+            <form id="search" class="u-search-form">
+                <input name="query" v-model="searchQuery" class="u-search" placeholder="Search">
+                <span class="icon ion-ios-search"></span>
+            </form>
+ 
+            <div class="u-table">
+                <div class="u-head">
+                    <div class="u-tr" :style="{transform: `translate3d(${-this.left}px, 0, 0)`}">
+                        <div class="u-th"
+                             v-for="(index, column) in columns"
+                             :style="{ minWidth: column.width, flex: column.width ? 'none' : 1 }"
+                             @click.stop="sortBy($event, column.key)">
+ 
+                            <!-- slot head column -->
+                            <slot :name="'_' + index">{{ column.text }}</slot>
+ 
+                            <!-- sort button -->
+                            <span class="arrow" v-if="source[0][column.key]"
+                                  :class="sortOrders[column.key] > 0 ? 'asc' : 'dsc'">
+ 
+                        </div>
+                        <div v-if="edge" class="u-th scrollbar" :style="{ minWidth: this.edge + 'px' }"></div>
+                    </div>
+                </div>
+                <div class="u-body" @scroll.stop.prevent="onHorizontalScroll">
+                    <div class="u-tr" v-for="entry in items">
+                        <div class="u-td" v-for="column in columns" :style="{ minWidth: column.width, flex: column.width ? 'none' : 1 }">
+                            <slot :name="entry.id + '_' + column.key">{{entry[column.key]}}</slot>
+                        </div>
+                    </div>
+                </div>
+            </div>
+ 
+            <div class="information">Total {{source.length}} Records, Now {{ length }} Records, {{pages}} Pages</div>
+            <div class="text-center">
+                <ul class="pagination">
+                    <li @click.stop.prevent="jump('prev')">
+                        <a href="#" aria-label="Previous 10"><span aria-hidden="true" class="fa fa-angle-double-left"></span></a>
+                    </li>
+                    <li @click.stop.prevent="paginate(currentPage - 1)">
+                        <a href="#" aria-label="Previous"><span aria-hidden="true" class="fa fa-angle-left"></span></a>
+                    </li>
+                    <li v-for="n in scope" :class="{'active': n === this.currentPage}"><a href="#" @click.stop.prevent="paginate(n)">{{ n }}</a></li>
+                    <li @click.stop.prevent="paginate(currentPage + 1)">
+                        <a href="#" aria-label="Next"><span aria-hidden="true" class="fa fa-angle-right"></span></a>
+                    </li>
+                    <li @click.stop.prevent="jump('next')">
+                        <a href="#" aria-label="Next 10"><span aria-hidden="true" class="fa fa-angle-double-right"></span></a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </template>
+ 
+    <script src="http://cdn.bootcss.com/vue/1.0.21/vue.min.js"></script>
+ 
+    <script type="text/javascript">
+        'use strict';
+ 
+        Vue.component('app', {
+            props: {
+                source: {
+                    type: Array
+                },
+                columns: {
+                    type: Array
+                },
+                // count per page
+                size: {
+                    type: Number
+                },
+                paginatorSize: {
+                    type: Number,
+                    default: 10
+                }
+            },
+            data () {
+                var sortOrders = {}
+                this.columns.forEach(function (column) {
+                    if (column.key)
+                        sortOrders[column.key] = 1
+                })
+ 
+                return {
+                    left: 0,        // header row offset position.
+                    edge: 0,        // offset of scrollbar width.
+                    sortKey: '',    // column name of sort
+                    sortOrders: sortOrders,
+                    currentPage: 1,
+                    searchQuery: null,
+                }
+            },
+            template: '#app',
+            ready () {
+                var clientWidth = document.querySelector('.u-body').clientWidth
+                var offsetWidth = document.querySelector('.u-body').offsetWidth
+                this.edge = offsetWidth - clientWidth;
+            },
+            methods: {
+                onHorizontalScroll (e) {
+                    this.left = document.querySelector('.u-body').scrollLeft
+                },
+                sortBy (e, key) {
+                    this.sortKey = key
+                    this.sortOrders[key] = this.sortOrders[key] * -1
+                },
+                paginate (page) {
+                    if (page < 1) page = 1
+                    if (page > this.pages) page = this.pages
+                    this.currentPage = page
+                },
+                /**
+                 * jump to first page of N scope
+                 * @param  {String} dir [value is 'next' or 'prev', next or prev scope]
+                 */
+                jump (dir) {
+                    dir = dir || 'next';
+                    var first = this.scope[0]
+                    var last = this.scope.slice(-1)[0]
+                    var page = this.currentPage // default
+ 
+                    switch (dir) {
+                        case 'next':
+                            page = (first + this.paginatorSize) > this.pages ? last : (first + this.paginatorSize)
+                            break;
+                        case 'prev':
+                            page = (first - this.paginatorSize) < 1 ? 1 : (first - this.paginatorSize)
+                            break;
+                        default:
+                            break;
+                    }
+                    this.currentPage = page
+                }
+            },
+            computed: {
+                items() {
+                    return this.$eval('source | filterBy searchQuery | orderBy sortKey sortOrders[sortKey] | limitBy size start')
+                },
+                length() {
+                    // total source count include filter result
+                    return this.items.length
+                },
+                start () {
+                    return (this.currentPage - 1) * this.size
+                },
+                // current pages e.g. current page is 1 then reutrn [1..10]
+                scope () {
+                    var n = 1
+                    while (this.currentPage > this.paginatorSize * n) {
+                        n++
+                    }
+                    var startPage = this.paginatorSize * (n - 1) + 1
+                    var endPage = this.paginatorSize * n > this.pages ? this.pages : this.paginatorSize * n
+                    var arr = []
+                    for (var i = startPage; i <= endPage; i++) {
+                        arr.push(i)
+                    }
+                    return arr
+                },
+                pages () {
+                    var query = this.searchQuery
+                    var source = []
+                    var len = 0
+                    if (query) {
+                        // Using keep to save length by filter
+                        len = this.length
+                    } else {
+                        len = this.source.length
+                    }
+ 
+                    var pages = Math.ceil(len / this.size)
+                    if (this.currentPage > pages) {
+                        this.currentPage = 1
+                    }
+ 
+                    return pages
+                }
+            }
+        })
+ 
+        new Vue({
+            el: 'body',
+        })
+ 
+    </script>
+ 
+    <style>
+                .u-table-container {
+          overflow: hidden;
+          zoom: 1;
+        }
+ 
+        .u-tr {
+          display: flex;
+          flex-direction: row;
+ 
+          .u-td:first-child, .u-th:first-child {
+            border-left: none;
+          }
+        }
+ 
+        .u-th {
+          font-weight: 700;
+        }
+ 
+        .u-th,
+        .u-td {
+          min-width: 120px;
+          padding: 8px;
+          border-left: 1px solid #ddd;
+          border-bottom: 1px solid #ddd;
+          word-wrap: break-word;
+        }
+ 
+        .u-table {
+          border: 1px solid darken(#ddd, 10%);
+        }
+ 
+        .u-head {
+          .u-th {
+            border-bottom-color: darken(#ddd, 20%);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+ 
+ 
+            &:hover {
+              color: #636363;
+            }
+ 
+            &.scrollbar {
+              flex: none;
+              border-left: none;
+              padding: 0;
+              border-bottom: 1px solid darken(#ddd, 10%);
+            }
+          }
+        }
+ 
+        .u-body {
+          overflow: auto;
+          // overflow-y: scroll;
+          max-height: 75vh;
+ 
+          .u-tr {
+            &:hover {
+              background: lighten(#f3f3f3, 2%);
+            }
+          }
+        }
+ 
+        .arrow {
+          display: inline-block;
+          vertical-align: middle;
+          width: 0;
+          height: 0;
+          margin-left: 5px;
+          opacity: 0.66;
+        }
+ 
+        .arrow.asc {
+          border-left: 4px solid transparent;
+          border-right: 4px solid transparent;
+          border-bottom: 4px solid #333;
+        }
+ 
+        .arrow.dsc {
+          border-left: 4px solid transparent;
+          border-right: 4px solid transparent;
+          border-top: 4px solid #333;
+        }
+ 
+        .information {
+          text-align: right;
+          color: rgba(0, 0, 0, .57);
+          font-size: .9em;
+          padding-right: 5px;
+        }
+ 
+        .text-center {
+          text-align: center;
+        }
+ 
+        .u-search-form {
+          text-align: right;
+          position: relative;
+ 
+          .u-search {
+            border-radius: 15px;
+            border: 1px solid #ccc;
+            margin-bottom: 5px;
+            min-width: 180px;
+            padding: 5px 20px;
+          }
+ 
+          .ion-ios-search {
+            position: absolute;
+            right: 10px;
+            top: 5px;
+            font-size: 1.2em;
+          }
+ 
+        }
+ 
+        ul.pagination {
+          display: inline-block;
+          padding: 0;
+          margin: 15px 0 0 0;
+        }
+ 
+        ul.pagination li {display: inline;}
+ 
+        ul.pagination li a {
+          color: #999;
+          float: left;
+          padding: 8px 16px;
+          text-decoration: none;
+          border-top: 1px solid #ddd;
+          border-bottom: 1px solid #ddd;
+          border-right: 1px solid #ddd;
+ 
+          &:first-child {
+            border-left: 1px solid #ddd;
+          }
+        }
+        ul.pagination li a.active {
+            background-color: #4CAF50;
+            color: white;
+        }
+ 
+        ul.pagination li a:hover:not(.active) {background-color: #ddd;}
+    </style>
+</body>
+</html>
