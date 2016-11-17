@@ -1,0 +1,68 @@
+.header {
+	background-color: #75eeff;
+	box-shadow: 0 1px 2px rgba(0, 0, 0, 0);
+}
+.header span,
+.header h1,
+.header>a,
+.header>button {
+	color: #fff!important;
+}
+.header .smaller button,.header .smaller span{
+	font-size: 0.8rem!important;
+}
+.din-icon-camera {
+	background-image: url(../img/din-invite.png);
+	background-size: 100% 100%;
+	width: 26px;
+	height: 26px;
+}
+.nav-btn {
+	padding: 6px 6px!important;
+}
+.din-icon-set {
+	background-image: url(../img/set.png);
+	background-size: 100% 100%;
+	width: 26px;
+	height: 26px;
+}
+.grey {
+	color: #ACACB4;
+}
+.boodin {
+	color: #75eeff;
+}
+@-webkit-keyframes loading {
+	0% {
+		-webkit-transform: rotateY(0deg);
+	}
+	100% {
+		-webkit-transform: rotateY(360deg);
+	}
+}
+.boodin-loading {
+	background-image: url(../img/boodin-icon.png);
+	background-size: cover;
+	width: 20%;
+	height: 0;
+	padding-bottom: 20%;
+	position: fixed;
+	left: 40%;
+	top: 100px;
+	z-index: 99;
+	-webkit-animation-name: loading;
+	-webkit-animation-duration: 1s;
+	-webkit-animation-timing-function: ease-in;
+	-webkit-animation-iteration-count: infinite;
+}
+.chat-to {
+	position: fixed;
+	height: 40px;
+	width: 100%;
+	background-color: rgba(99, 206, 221, 0.77);
+	bottom: 0px;
+	text-align: center;
+	font-size: 1rem;
+	line-height: 40px;
+	color: #fff;
+}

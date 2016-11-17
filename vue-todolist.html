@@ -23,45 +23,52 @@ body{font-size:14px;}
 </style>
 </head>
 <body>
-<div id="app-4">
-  <ol>
-    <li v-for="todo in todos">
-      {{ todo.text }}
-    </li>
-  </ol>
+<div id="todo-list-example">
+  <input
+    v-model="newTodoText"
+    v-on:keyup.enter="addNewTodo"
+    placeholder="Add a todo"
+  >
+  <ul>
+    <li
+      is="todo-item"
+      v-for="(todo, index) in todos"
+      v-bind:title="todo"
+      v-on:remove="todos.splice(index, 1)"
+    ></li>
+  </ul>
 </div>
-
-<ul id="repeat-object" class="demo">
-  <li v-for="(value,key,index) in object">
-     {{ index }}. {{ key }} : {{ value }}
-  </li>
-</ul>
 
 <script src="vue-2.0.6.js"></script>
 <script type="text/javascript">
-var app4 = new Vue({
-  el: '#app-4',
-  data: {
-    todos: [
-      { text: 'Learn JavaScript' },
-      { text: 'Learn Vue' },
-      { text: 'Build something awesome' }
-    ]
-  }
-});
-</script>
-
-<script type="text/javascript">
+Vue.component('todo-item', {
+  template: '\
+    <li>\
+      {{ title }}\
+      <button v-on:click="$emit(\'remove\')">X</button>\
+    </li>\
+  ',
+  props: ['title']
+})
 new Vue({
-  el: '#repeat-object',
+  el: '#todo-list-example',
   data: {
-    object: {
-      FirstName: 'John',
-      LastName: 'Doe',
-      Age: 30
+    newTodoText: '',
+    todos: [
+      'Do the dishes',
+      'Take out the trash',
+      'Mow the lawn'
+    ]
+  },
+  methods: {
+    addNewTodo: function () {
+      this.todos.push(this.newTodoText)
+      this.newTodoText = ''
     }
   }
 })
 </script>
+
+
 </body>
 </html>

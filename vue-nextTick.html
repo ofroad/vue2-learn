@@ -23,45 +23,24 @@ body{font-size:14px;}
 </style>
 </head>
 <body>
-<div id="app-4">
-  <ol>
-    <li v-for="todo in todos">
-      {{ todo.text }}
-    </li>
-  </ol>
-</div>
-
-<ul id="repeat-object" class="demo">
-  <li v-for="(value,key,index) in object">
-     {{ index }}. {{ key }} : {{ value }}
-  </li>
-</ul>
+<div id="example">{{message}}</div>
 
 <script src="vue-2.0.6.js"></script>
 <script type="text/javascript">
-var app4 = new Vue({
-  el: '#app-4',
+var vm = new Vue({
+  el: '#example',
   data: {
-    todos: [
-      { text: 'Learn JavaScript' },
-      { text: 'Learn Vue' },
-      { text: 'Build something awesome' }
-    ]
-  }
-});
-</script>
-
-<script type="text/javascript">
-new Vue({
-  el: '#repeat-object',
-  data: {
-    object: {
-      FirstName: 'John',
-      LastName: 'Doe',
-      Age: 30
-    }
+    message: '123'
   }
 })
+//vm.message = 'new message' // 更改数据
+//vm.$el.textContent === 'new message' // false
+
+
+Vue.nextTick(function () {
+  vm.$el.textContent = 'new message' // true
+})
+
 </script>
 </body>
 </html>

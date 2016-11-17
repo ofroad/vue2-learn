@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>vue tab </title>
+<style>
+html,body,p,ul,li,dl,dt,dd,ol,h1,h2,h3,h4,h5{padding: 0; margin: 0;}
+img{border: 0;}
+ul,li{list-style: none;}
+a{color: #4D647C; text-decoration: none;}
+a:hover{color: #44C5D0;}
+a.highlight:hover{color: #00a6ab;}
+.highlight{color: #44c5d0;}
+.tint{color: #87a4b6;}
+h2{color: #8ba4c0;}
+label{color: #4d647c;}
+body{font: 14px/1.6 arial, "microsoft yahei"; color: #8ba4be; }
+body{font-size:14px;}
+#app ul{height:30px;}
+#app li{float:left; margin:0 10px 0 0;}
+.weui_navbar_item{color:#cccccc;}
+.weui_bar_item_on{color:#ff0000;}
+</style>
+</head>
+<body>
+<div id="example-3">
+	<input type="checkbox" id="checkbox" value="name" v-model="tog" />
+	<label for="checkbox">{{tog}}</label>
+</div>
+
+<div id="example-4">
+	<input type="checkbox" id="jack" value="Jack123" v-model="checkedNames">
+	<label for="jack">Jack</label>
+	<input type="checkbox" id="john" value="John123" v-model="checkedNames">
+	<label for="john">John</label>
+	<input type="checkbox" id="mike" value="Mike123" v-model="checkedNames">
+	<label for="mike">Mike</label>
+	<br>
+	<span>Checked names: {{ checkedNames }}</span>
+</div>
+
+<div id="example-5">
+	<input type="checkbox" id="checkbox-a" value="yuss" v-model="togs"  v-bind:true-value="a" v-bind:false-value="b" />
+	<label for="checkbox-a">{{togs}}</label>
+</div>
+
+<script src="vue-2.0.6.js"></script>
+<script type="text/javascript">
+var vm=new Vue({
+  el: '#example-3',
+  data: {
+	tog:true
+  }
+});
+console.log(vm.checked);
+</script>
+
+<script type="text/javascript">
+new Vue({
+  el: '#example-4',
+  data: {
+    checkedNames: []
+  }
+})
+</script>
+
+<script type="text/javascript">
+var vm=new Vue({
+  el: '#example-5',
+  data: {
+    togs:true,
+	a:"已选中",
+	b:"fff"
+  }
+});
+console.log(vm.checked);
+</script>
+</body>
+</html>

@@ -1,0 +1,832 @@
+
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title></title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <link rel="stylesheet" href="css/mui.min.css">
+    <link rel="stylesheet" type="text/css" href="css/app-base.css" />
+    <link rel="stylesheet" type="text/css" href="css/app-index.css" />
+    <link rel="stylesheet" type="text/css" href="css/swiper.min.css" />
+</head>
+
+<body>
+    <div id="app">
+        <router-view></router-view>
+    </div>
+    <script src="js/vue.js"></script>
+    <script src="js/vue-router.min.js"></script>
+    <script src="js/vue-resource.min.js"></script>
+    <script src="js/vue-async-data.js"></script>
+    <script src="js/swiper.min.js"></script>
+    <script>
+    Vue.use(VueAsyncData);
+    Vue.config.debug = true;
+    // Define some components
+    var Index = Vue.extend({
+
+        data: function() {
+            return {
+                Index: {
+                    slider: [{
+                        src: "img/slider.png"
+                    }],
+                    servicelist: {},
+                    siteInfo: {
+                        sitename: "布丁约拍"
+                    }
+                }
+            }
+        },
+
+        asyncData: function(resolve, reject) {
+            var self = this;
+            if (!localStorage.lbsCity) {
+                localStorage.lbsCity = '成都';
+            }
+            setTimeout(function() {
+                self.$http.get('data/servicelist.json', function(data, status, request) {
+                    resolve({
+                        Index: {
+                            slider: [{
+                                src: "img/slider.png"
+                            }, {
+                                src: "img/slider.png"
+                            }],
+                            servicelist: data,
+                            siteInfo: {
+                                area: localStorage.lbsCity,
+                                sitename: "布丁约拍"
+                            }
+                        }
+                    })
+                    self.$nextTick(function() {
+                        var swiper = new Swiper('.swiper-container', {
+                            pagination: '.swiper-pagination',
+                            paginationClickable: true,
+                            preloadImages: false,
+                            lazyLoading: true,
+                            spaceBetween: 30,
+                            effect: 'fade'
+                        });
+                    });
+
+                }).error(function(data, status, request) {
+
+                });
+
+            }, 10000)
+        },
+        methods: {
+            goBack: function(e) {
+                history.go(-1);
+            }
+        },
+
+        template: '<header class="header mui-bar mui-bar-nav"><button v-link="/lbs" class="smaller mui-btn mui-btn-link mui-btn-nav mui-pull-left"><span>{{Index.siteInfo.area}} </span><span class="mui-icon mui-icon-arrowdown"></span></button><button v-link="/me" class="mui-btn mui-btn-link mui-btn-nav mui-pull-right"><span class="mui-icon mui-icon-person"></span></button><h1 id="title" class="mui-title">{{Index.siteInfo.sitename}}</h1></header>' +
+            '<div class="mui-content">' +
+            '<div class="index-slider-box">' +
+            '<div class="swiper-container">' +
+            '<div id="slider" class="swiper-wrapper">' +
+            ' <div v-repeat="img in Index.slider" class="swiper-slide">' +
+            '<img v-link="{{img.url}}" data-src="{{img.src}}" class="swiper-lazy">' +
+            '<div class="swiper-lazy-preloader swiper-lazy-preloader-white"></div>' +
+            '</div>' +
+            '</div>' +
+            '<div class="swiper-pagination swiper-pagination-white"></div>' +
+            '</div>' +
+            '</div>' +
+            '<div class="index-nav-box">' +
+            '<ul>' +
+            '<li v-link="/modellist" class="index-nav-item">' +
+            '<div class="index-nav-img"></div>' +
+            '<span class="index-nav-word">约麻豆</span>' +
+            '</li>' +
+            '<li v-link="/servicelist/1" class="index-nav-item">' +
+            '<div class="index-nav-img index-nav-img-1"></div>' +
+            '<span class="index-nav-word">约摄影师</span>' +
+            '</li>' +
+            '<li v-link="/articlelist/1" class="index-nav-item">' +
+            '<div class="index-nav-img index-nav-img-3"></div>' +
+            '<span class="index-nav-word">摄影分享</span>' +
+            '</li>' +
+            '</ul>' +
+            '</div>' +
+            '<div class="index-x-box">' +
+            '<ul>' +
+            '<li v-link="/service/{{s.id}}" v-repeat="s in Index.servicelist">' +
+            '<div class="index-x-title-box"><div class="index-x-title"><span>{{s.user.name}} · {{s.name}}</span></div><div class="index-x-txt"><span>{{s.say}}</span></div></div>' +
+            '<img v-attr="src:s.img">' +
+            '<div class="index-x-lbs">' +
+            '<div class="index-x-lbs-icon"></div>' +
+            '<span class="index-x-lbs-area">{{s.user.city}}</span>' +
+            '</div>' +
+            '</li>' +
+            '</ul>' +
+            '</div>' +
+            '</div>'
+
+    })
+
+    var ServiceList = Vue.extend({
+        data: function() {
+            return {
+                ServiceList: {}
+            }
+        },
+        ready: function() {
+            window.scrollTo(0, 0);
+        },
+        asyncData: function(resolve, reject) {
+            var self = this;
+            setTimeout(function() {
+                self.$http.get('data/servicelist.json', function(data, status, request) {
+                    resolve({
+                        ServiceList: data
+                    })
+
+                }).error(function(data, status, request) {
+
+                });
+
+            }, 1000)
+        },
+        methods: {
+            goBack: function(e) {
+                history.go(-1);
+            }
+        },
+        template: '<header class="header mui-bar mui-bar-nav">' +
+            '<a  v-on="click: goBack" class="mui-icon mui-icon-left-nav mui-pull-left"></a>' +
+            '<h1 class="mui-title">摄影师</h1>' +
+            '</header>' + '<div v-if="$loadingAsyncData"><div class="spinner"><div class="double-bounce1"></div><div class="double-bounce2"></div></div></div>' +
+            '<div v-if="!$loadingAsyncData" class=" mui-content article-page">' +
+            '<ul><li v-repeat="s in ServiceList">' +
+            '<div class="magix-box">' +
+            '<div v-link="/service/{{s.id}}" class="magix-box-img" style="background-image: url({{s.img}});"></div>' +
+            '<div class="magix-box-plus"></div>' +
+            '<div v-link="/user/{{s.user.id}}" class="magix-box-ava" style="background-image: url({{s.user.avatar.src}});"></div>' +
+            '<div class="magix-box-title"><span class="magix-price">免费</span> <span class="grey"> • </span><span id="magixTitle">{{s.name}}</span></div>' +
+            '<div class="magix-box-txt grey">' +
+            '<span class="serviceList-tag" v-repeat="t in s.tag">{{t}}</span><span class="boodin">★</span><span class="boodin">★</span><span class="boodin">★</span><span class="boodin">★</span><span class="magix-praise">{{s.user.praised}}条评价</span>' +
+            '</div>' +
+            '</div>' +
+            '</li></ul>' +
+            '</div>'
+    })
+    
+    var ModelList = Vue.extend({
+        data: function() {
+            return {
+               ModelList: {}
+            }
+        },
+        ready: function() {
+            window.scrollTo(0, 0);
+        },
+        asyncData: function(resolve, reject) {
+            var self = this;
+            setTimeout(function() {
+                self.$http.get('data/modellist.json', function(data, status, request) {
+                    resolve({
+                        ModelList: data
+                    })
+
+                }).error(function(data, status, request) {
+
+                });
+
+            }, 1000)
+        },
+        methods: {
+            goBack: function(e) {
+                history.go(-1);
+            }
+        },
+        template: '<header class="header mui-bar mui-bar-nav">' +
+            '<a  v-on="click: goBack" class="mui-icon mui-icon-left-nav mui-pull-left"></a>' +
+            '<h1 class="mui-title">模特</h1>' +
+            '</header>' + '<div v-if="$loadingAsyncData"><div class="spinner"><div class="double-bounce1"></div><div class="double-bounce2"></div></div></div>' +
+            '<div v-if="!$loadingAsyncData" class=" mui-content modellist-page">' +
+            '<div class="index-x-box">' +
+            '<ul>' +
+            '<li v-link="/post/{{s.id}}" v-repeat="s in ModelList">' +
+            '<div class="index-x-title-box"><div class="index-x-txt"><span>{{s.say}}</span></div></div>' +
+            '<img v-attr="src:s.img">' +
+            '<div class="index-x-lbs">' +
+            '<div class="index-x-lbs-icon"></div>' +
+            '<span class="index-x-lbs-area">{{s.user.city}}</span>' +
+            '</div>' +
+            '</li>' +
+            '</ul>' +
+            '</div>' +
+            '</div>'
+    })
+    
+    var Post = Vue.extend({
+        data: function() {
+            return {
+                post: {}
+            }
+        },
+        asyncData: function(resolve, reject) {
+            var self = this;
+            setTimeout(function() {
+                self.$http.get('data/post.json', function(data, status, request) {
+                    resolve({
+                        post: data[0]//data[self.$route.params.id - 1]
+                    })
+
+                }).error(function(data, status, request) {
+
+                });
+
+            }, 1000)
+        },
+        ready: function() {
+            window.scrollTo(0, 0);
+        },
+        methods: {
+            goBack: function(e) {
+                history.go(-1);
+            }
+        },
+        template: '<header class="header mui-bar mui-bar-nav">' +
+            '<a  v-on="click: goBack" class="mui-icon mui-icon-left-nav mui-pull-left"></a>' +
+            '<h1 class="mui-title">主题贴</h1>' +
+            '</header>' +
+            '<div v-if="$loadingAsyncData"><div class="spinner"><div class="double-bounce1"></div><div class="double-bounce2"></div></div></div>' +
+            '<div v-if="!$loadingAsyncData" class=" mui-content post-page">' +
+            '<div class=" boodin-flow">'+
+                '<ul class="mui-table-view mui-table-view-chevron">'+
+            '<li>'+
+                        '<div class="item-hd">'+
+                            '<div class="item-ava">'+
+                                '<div style="background-image:url({{post.user.avatar}})"></div>'+
+                            '</div>'+
+                            '<div class="item-user">{{post.user.name}}</div>'+
+                            '<div class="item-time">'+
+                                '<div class="item-time-timer"></div><span class="item-time-time">{{post.time}}</span>'+
+                            '</div>'+
+                        '</div>'+
+                        '<div class="item-bd">'+
+                            '<div class="item-img-box">'+
+                                '<img v-repeat="img in post.img" v-attr="src:img.src">'+
+                            '</div>'+
+                            '<div class="item-txt-box">'+
+                                '<p>{{post.txt}}</p>'+
+                            '</div>'+
+                        '</div>'+
+                        '<div class="item-ft">'+
+                            '<div class="item-right-box">'+
+                                '<div class="praise">'+
+                                    '<div class="icon-heart">'+
+                                    '</div>'+
+                                    '<span id="praiseNum">7</span>'+
+                                    '<div class="icon-word"></div>'+
+                                    '<span id="wordNum">3</span>'+
+                                '</div>'+
+                            '</div>'+
+                        '</div>'+
+                    '</li>'+
+                    '</ul>'+
+                    '</div>'+
+            '</div>'
+    })
+
+    var Me = Vue.extend({
+        data: function() {
+            return {
+                Me: {}
+            }
+        },
+        ready: function() {
+            if (!localStorage.logined) {
+                location.href = '#!/login';
+            }
+            window.scrollTo(0, 0);
+        },
+        asyncData: function(resolve, reject) {
+            var self = this;
+            setTimeout(function() {
+                self.$http.get('data/user.json', function(data, status, request) {
+                    resolve({
+                        Me: data
+                    })
+
+                }).error(function(data, status, request) {
+
+                });
+
+            }, 1000)
+        },
+        methods: {
+            goBack: function(e) {
+                history.go(-1);
+            },
+            loginOut:function(){
+                localStorage.logined ='';
+                location.href = "#!/";
+            }
+        },
+        template: '<header class="service-header header mui-bar mui-bar-nav">' +
+            '<a  v-on="click: goBack" class="mui-icon mui-icon-left-nav mui-pull-left"></a>' +
+            '</header>' +
+            '<div v-if="$loadingAsyncData"><div class="spinner"><div class="double-bounce1"></div><div class="double-bounce2"></div></div></div>' +
+            '<div v-if="!$loadingAsyncData"  class=" mui-content user-page">' +
+            '<div class="me-bg-box" style="background-image:url({{Me.avatar}})">' +
+            '<div class="me-bg" style="background-image:url({{Me.avatar}})"></div>' +
+            '</div>' +
+            '<div class="user-box">' +
+            '<div class="user-avatar" style="background-image:url({{Me.avatar}})"></div>' +
+            ' <div class="user-name">{{Me.name}}</div>' +
+            '<div class="user-word"><span>{{Me.ordered}} </span> 约拍 | <span>{{Me.praised}}</span> 赞</div>' +
+            '</div>' +
+
+            '<div class=" mui-content me-page">' +
+            '<div class="mui-scroll-wrapper">'+
+                    '<div class="mui-scroll">'+
+                        '<ul class="mui-table-view mui-table-view-chevron">'+
+                            '<li class="mui-table-view-cell">'+
+                                '<a class="mui-navigate-right">我的邀约</a>'+
+                            '</li>'+
+                            '<li class="mui-table-view-cell">'+
+                                '<a class="mui-navigate-right">分享推荐</a>'+
+                            '</li>'+
+                            '<li class="mui-table-view-cell">'+
+                                '<a class="mui-navigate-right">问题反馈</a>'+
+                            '</li>'+
+                        '</ul>'+
+                        '<ul class="mui-table-view">'+
+                            '<li v-on="click:loginOut" class="mui-table-view-cell" style="text-align: center;">'+
+                                '<a>退出</a>'+
+                            '</li>'+
+                        '</ul>'+
+                   '</div>'+
+                '</div>'+
+
+            '</div>'
+    })
+
+    var Lbs = Vue.extend({
+        data: function() {
+            return {
+                lbs: {
+                    locat: "成都",
+                    cities: [{
+                        id: 1,
+                        name: "成都"
+                    }, {
+                        id: 2,
+                        name: "吉林"
+                    }, {
+                        id: 3,
+                        name: "德阳"
+                    }]
+                }
+            }
+        },
+        template: '<header class="header mui-bar mui-bar-nav">' +
+            '<a  v-on="click: goBack" class="mui-icon mui-icon-left-nav mui-pull-left"></a>' +
+            '<h1 class="mui-title">选择城市</h1>' +
+            '</header>' +
+            '<div class=" mui-content lbs-page">' +
+            '<div class="lbs-title"><span>当前定位城市</span></div>' +
+            '<div class="lbs-auto-box">' +
+            '<span>{{lbs.locat}}</span>' +
+            '</div>' +
+            '<div class="lbs-title"><span>已开通服务的城市</span></div>' +
+            '<ul class="lbs-cities-box">' +
+            '<li v-on="click:cityChecked" v-repeat="c in lbs.cities">' +
+            '<span>{{c.name}}</span>' +
+            '</li>' +
+            '</ul>' +
+
+            '</div>',
+        methods: {
+            goBack: function(e) {
+                history.go(-1);
+            },
+            cityChecked: function(e) {
+                localStorage.lbsCity = e.target.innerText;
+                history.go(-1);
+            }
+        }
+    })
+    var Login = Vue.extend({
+        ready:function(){
+            if(localStorage.logined){
+                location.href ='#!/'
+            }
+        },
+        data: function() {
+            return {
+                username: "",
+                password: ""
+            }
+        },
+        template: '<header class="header mui-bar mui-bar-nav service-header">' +
+            '<a  v-on="click: goBack" class="mui-icon mui-icon-left-nav mui-pull-left"></a>' +
+            '<h1 class="mui-title"></h1>' +
+            '</header>' +
+            '<div class=" mui-content login-page">' +
+            '<form id="login-form" class="mui-input-group">' +
+            '<div class="mui-input-row">' +
+            '<label>账号</label>' +
+            '<input type="text" class="mui-input-clear mui-input" placeholder="请输入账号" v-model="username">' +
+            '</div>' +
+            '<div class="mui-input-row">' +
+            '<label>密码</label>' +
+            '<input id="password" type="password" class="mui-input-clear mui-input" placeholder="请输入密码" v-model="password">' +
+            '</div>' +
+            '</form>' +
+
+            '<div class="mui-content-padded">' +
+            '<button v-on="click:logined" class="mui-btn mui-btn-block login-btn">登录</button>' +
+            '<div class="link-area"><a v-link="/reg">注册账号</a> <span class="spliter">|</span> <a id="forgetPassword">忘记密码</a>' +
+            '</div>' +
+            '</div>' +
+
+            '</div>',
+        methods: {
+            goBack: function(e) {
+                location.href = '#!/'
+            },
+            logined: function() {
+                localStorage.logined = true;
+                location.href ="#!/me";
+            }
+        }
+    })
+    var Reg = Vue.extend({
+        ready:function(){
+            if(localStorage.logined){
+                location.href ='#!/'
+            }
+        },
+        data: function() {
+            return {
+                tel: "",
+                password: "",
+                repassword:""
+            }
+        },
+        template: '<header class="header mui-bar mui-bar-nav service-header">' +
+            '<a  v-on="click: goBack" class="mui-icon mui-icon-left-nav mui-pull-left"></a>' +
+            '<h1 class="mui-title"></h1>' +
+            '</header>' +
+            '<div class=" mui-content login-page">' +
+            '<form class="mui-input-group">'+
+                '<div class="mui-input-row">'+
+                    '<label>手机</label>'+
+                    '<input type="text" class="mui-input-clear mui-input" placeholder="请输入手机" v-model="tel">'+
+                '</div>'+
+                '<div class="mui-input-row">'+
+                    '<label>密码</label>'+
+                    '<input type="password" class="mui-input-clear mui-input" placeholder="请输入密码" v-model="password">'+
+                '</div>'+
+                '<div class="mui-input-row">'+
+                    '<label>确认</label>'+
+                    '<input type="password" class="mui-input-clear mui-input" placeholder="请确认密码" v-model="repassword">'+
+                '</div>'+
+            '</form>'+
+            '<div class="mui-content-padded">'+
+                '<button v-on="click:reged" class="mui-btn mui-btn-block login-btn">注册</button>'+
+            '</div>'+
+
+            '</div>',
+        methods: {
+            goBack: function(e) {
+                location.href = '#!/'
+            },
+            reged: function() {
+                localStorage.logined = true;
+                location.href ="#!/me";
+            }
+        }
+    })
+    var Article = Vue.extend({
+        data: function() {
+            return {
+                article: {}
+            }
+        },
+        asyncData: function(resolve, reject) {
+            var self = this;
+            setTimeout(function() {
+                self.$http.get('data/article.json', function(data, status, request) {
+                    resolve({
+                        article: data[self.$route.params.id - 1]
+                    })
+
+                }).error(function(data, status, request) {
+
+                });
+
+            }, 1000)
+        },
+        ready: function() {
+            window.scrollTo(0, 0);
+        },
+        methods: {
+            goBack: function(e) {
+                history.go(-1);
+            }
+        },
+        template: '<header class="header mui-bar mui-bar-nav">' +
+            '<a  v-on="click: goBack" class="mui-icon mui-icon-left-nav mui-pull-left"></a>' +
+            '<h1 class="mui-title">{{article.title}}</h1>' +
+            '</header>' +
+            '<div v-if="$loadingAsyncData"><div class="spinner"><div class="double-bounce1"></div><div class="double-bounce2"></div></div></div>' +
+            '<div v-if="!$loadingAsyncData" class=" mui-content article-page">' +
+            '<div class="article-title"><span>{{article.title}}<span></div>' +
+            '<div class="article-area">{{{article.article}}}</div>' +
+            '</div>'
+    })
+
+    var ArticleList = Vue.extend({
+        data: function() {
+            return {
+                articleList: {}
+            }
+        },
+        asyncData: function(resolve, reject) {
+            var self = this;
+            setTimeout(function() {
+                self.$http.get('data/article.json', function(data, status, request) {
+                    resolve({
+                        articleList: data
+                    })
+
+                }).error(function(data, status, request) {
+
+                });
+
+            }, 1000)
+        },
+        ready: function() {
+            window.scrollTo(0, 0);
+        },
+        methods: {
+            goBack: function(e) {
+                history.go(-1);
+            }
+        },
+        template: '<header class="header mui-bar mui-bar-nav">' +
+            '<a  v-on="click: goBack" class="mui-icon mui-icon-left-nav mui-pull-left"></a>' +
+            '<h1 class="mui-title">摄影分享</h1>' +
+            '</header>' +
+            '<div v-if="$loadingAsyncData"><div class="spinner"><div class="double-bounce1"></div><div class="double-bounce2"></div></div></div>' +
+            '<div v-if="!$loadingAsyncData" class=" mui-content articlelist-page">' +
+            '<ul>' +
+            '<li v-link="/article/{{item.id}}" v-repeat="item in articleList">' +
+            '<div class="articlelist-title">{{item.title}}</div>' +
+            '<div class="articlelist-author grey">{{item.author}}</div>' +
+            '<div class="articlelist-img" style="background-image:url({{item.img[0].src}})"></div>' +
+            '</li>' +
+            '</ul>' +
+            '</div>'
+    })
+
+    var User = Vue.extend({
+        ready: function() {
+            window.scrollTo(0, 0);
+        },
+        data: function() {
+            return {
+                user: {
+                    avatar: {},
+                }
+            }
+        },
+        asyncData: function(resolve, reject) {
+            var self = this;
+            setTimeout(function() {
+                self.$http.get('data/user.json', function(data, status, request) {
+                    resolve({
+                        user: data
+                    })
+
+                }).error(function(data, status, request) {
+
+                });
+
+            }, 1000)
+        },
+        methods: {
+            goBack: function(e) {
+                history.go(-1);
+            }
+        },
+        template: '<header class="service-header header mui-bar mui-bar-nav">' +
+            '<a  v-on="click: goBack" class="mui-icon mui-icon-left-nav mui-pull-left"></a>' +
+            '</header>' +
+            '<div v-if="$loadingAsyncData"><div class="spinner"><div class="double-bounce1"></div><div class="double-bounce2"></div></div></div>' +
+            '<div v-if="!$loadingAsyncData" class=" mui-content user-page">' +
+            '<div class="me-bg-box" style="background-image:url({{user.avatar}})">' +
+            '<div class="me-bg" style="background-image:url({{user.avatar}})"></div>' +
+            '</div>' +
+            '<div class="user-box">' +
+            '<div class="user-avatar" style="background-image:url({{user.avatar}})"></div>' +
+            ' <div class="user-name">{{user.name}}</div>' +
+            '<div class="user-word"><span>{{user.ordered}} </span> 约拍 | <span>{{user.praised}}</span> 赞</div>' +
+            '</div>' +
+            '<div class="user-info-box">' +
+            '<div class="user-info-title grey">关于{{user.name}}</div>' +
+            '<div class="user-info-words"><span>{{user.word}}</span></div>' +
+            '<div class="user-info-row"><span class="user-info-row-title grey">性别</span><span class="user-info-row-txt">男</span></div>' +
+            '<div class="user-info-row"><span class="user-info-row-title grey">学校</span><span class="user-info-row-txt">西华大学</span></div>' +
+            '<div class="user-info-row"><span class="user-info-row-title grey">城市</span><span class="user-info-row-txt">成都</span></div>' +
+            '<div class="user-info-title grey">身份验证</div>' +
+            '<div class="user-info-row"><span class="user-info-row-title grey">手机号码</span><span class="user-info-row-true">✔</span></div>' +
+            '<div class="user-info-row"><span class="user-info-row-title grey">学生证实名认证</span><span class="user-info-row-true">✔</span></div>' +
+            '</div>' +
+            '<div class="user-service-box">' +
+            '<div class="user-service-title  grey">服务列表</div>' +
+            '<ul>' +
+            '<li v-link="/service/1" v-repeat="s in user.service">' +
+            '<div class="user-service-item-img" style="background-image:url({{s.img[0].src}})"></div>' +
+            '<div class="user-service-item-price">￥ {{s.price}}</div>' +
+            '<div class="user-service-item-title">{{s.title}}</div>' +
+            '</li>' +
+            '</ul>' +
+            '</div>' +
+            '</div>'
+    })
+
+    var Service = Vue.extend({
+        data: function() {
+            return {
+                service: {
+                    "img": [{
+                        "id": 1,
+                        "src": "img/testimg3.png"
+                    }],
+                    user: {
+                        "avatar": "img/guimi.png"
+                    }
+                }
+            }
+        },
+        asyncData: function(resolve, reject) {
+            var self = this;
+            setTimeout(function() {
+                self.$http.get('data/service.json', function(data, status, request) {
+                    resolve({
+                        service: data
+                    })
+
+
+                    self.$nextTick(function() {
+                        var swiper = new Swiper('.swiper-container', {
+                            nextButton: '.swiper-button-next',
+                            prevButton: '.swiper-button-prev',
+                            pagination: '.swiper-pagination',
+                            paginationClickable: true,
+                            preloadImages: false,
+                            lazyLoading: true,
+                            spaceBetween: 30,
+                            effect: 'fade'
+                        });
+                    });
+                }).error(function(data, status, request) {
+
+                });
+
+            }, 1000)
+        },
+        ready: function() {
+            window.scrollTo(0, 0);
+
+
+
+        },
+        methods: {
+            goBack: function(e) {
+                history.go(-1);
+            }
+        },
+        template: '<header class="service-header header mui-bar mui-bar-nav">' +
+            '<a  v-on="click: goBack" class="mui-icon mui-icon-left-nav mui-pull-left"></a>' +
+            '<h1 class="mui-title">服务详情</h1>' +
+            '</header>' +
+            '<div v-if="$loadingAsyncData"><div class="spinner"><div class="double-bounce1"></div><div class="double-bounce2"></div></div></div>' +
+            '<div  v-if="!$loadingAsyncData" class=" mui-content service-page">' +
+            '<div class="service-img-box">' +
+            '<div class="swiper-container">' +
+            '<div id="slider" class="swiper-wrapper">' +
+            ' <div v-repeat="img in service.img" class="swiper-slide">' +
+            '<img data-src="{{img.src}}" class="swiper-lazy">' +
+            '<div class="swiper-lazy-preloader swiper-lazy-preloader-white"></div>' +
+            '</div>' +
+            '</div>' +
+            '<div class="swiper-pagination swiper-pagination-white"></div>' +
+            '</div>' +
+            '</div>' +
+            '<div class="service-title-box">' +
+            '<div class="service-title">' +
+            '<span>{{service.title}}</span>' +
+            '</div>' +
+            '<div class="service-price">' +
+            '<span>￥ {{service.price}}</span>' +
+            '</div>' +
+            '</div>' +
+            '<div class="service-detail-box">' +
+            '<div class="service-detail-title grey">' +
+            '<span>服务内容</span>' +
+            '</div>' +
+            '<div class="service-detail-row">' +
+            '<span>拍摄地点：{{service.area}}</span>' +
+            '</div>' +
+            '<div class="service-detail-row">' +
+            '<span>拍摄时长：{{service.time}}</span>' +
+            '</div>' +
+            '<div class="service-detail-row">' +
+            '<span>底片张数：{{service.negative}}</span>' +
+            '</div>' +
+            '<div class="service-detail-row">' +
+            '<span>精修张数：{{service.psed}}</span>' +
+            '</div>' +
+            '<div class="service-detail-row">' +
+            '<span>化妆：{{service.dressing}}</span>' +
+            '</div>' +
+            '<div class="service-detail-row">' +
+            '<span>原片：{{service.negative_give}}</span>' +
+            '</div>' +
+            '<div class="service-detail-row">' +
+            '<span>备注：{{service.remark}}</span>' +
+            '</div>' +
+            '</div>' +
+            '<div class="service-user-box">' +
+            '<div v-link="/user/10" class="service-user-ava" style="background-image:url({{service.user.avatar}})"></div>' +
+            '<div class="service-user-name">' +
+            '<span>{{service.user.name}}</span>' +
+            '</div>' +
+            '<div class="service-user-words">' +
+            '<span>{{service.user.ordered}} 约拍 | {{service.user.praised}} 赞</span>' +
+            '</div>' +
+            '</div>' +
+            '<div class="service-imgview-box">' +
+            '<img v-attr="src:img.src" v-repeat="img in service.img">' +
+            '</div>' +
+            '</div>'
+    })
+
+    var App = Vue.extend({})
+
+    var router = new VueRouter({
+		//hashbang:false
+	})
+
+    router.map({
+        '/': {
+            component: Index,
+        },
+        '/servicelist/:id': {
+            component: ServiceList
+        },
+        'modellist':{
+            component:ModelList
+        },
+        '/service/:id': {
+            component: Service
+        },
+
+        '/lbs': {
+            component: Lbs
+        },
+        '/user/:uid': {
+            component: User
+        },
+        '/article/:id': {
+            component: Article
+        },
+        '/articlelist/:id': {
+            component: ArticleList
+        },
+        '/me': {
+            component: Me
+        },
+        '/login': {
+            component: Login
+        },
+        '/reg':{
+            component: Reg
+        },
+        '/post/:id':{
+            component:Post
+        }
+    })
+
+    // Now we can start the app!
+    // The router will create an instance of App and mount to
+    // the element matching the selector #app.
+    router.start(App, '#app')
+    </script>
+</body>
+
+</html>

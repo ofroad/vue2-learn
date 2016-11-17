@@ -25,43 +25,47 @@ body{font-size:14px;}
 <body>
 <div id="app-4">
   <ol>
-    <li v-for="todo in todos">
-      {{ todo.text }}
-    </li>
+    <li v-for="n in evenNumbers">{{ n }}</li>
   </ol>
 </div>
 
-<ul id="repeat-object" class="demo">
-  <li v-for="(value,key,index) in object">
-     {{ index }}. {{ key }} : {{ value }}
-  </li>
-</ul>
+<div id="app-5">
+  <ol>
+    <li v-for="n in even(numbers)">{{ n }}</li>
+  </ol>
+</div>
 
 <script src="vue-2.0.6.js"></script>
 <script type="text/javascript">
 var app4 = new Vue({
   el: '#app-4',
   data: {
-    todos: [
-      { text: 'Learn JavaScript' },
-      { text: 'Learn Vue' },
-      { text: 'Build something awesome' }
-    ]
+   numbers: [ 1, 2, 3, 4, 5 ]
+  },
+  computed: {
+	  evenNumbers: function () {
+		return this.numbers.filter(function (number) {
+		  return number % 2 === 0
+		})
+	  }
   }
 });
 </script>
 
 <script type="text/javascript">
-new Vue({
-  el: '#repeat-object',
+var app5 = new Vue({
+  el: '#app-5',
   data: {
-    object: {
-      FirstName: 'John',
-      LastName: 'Doe',
-      Age: 30
-    }
+    numbers: [ 1, 2, 3, 4, 5 ]
+  },
+  methods:{
+	  even: function (numbers) {
+		return numbers.filter(function (number) {
+		  return number % 2 === 0
+		})
+	  }
   }
-})
+});
 </script>
 </body>
 </html>
